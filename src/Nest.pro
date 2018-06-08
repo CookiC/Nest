@@ -52,7 +52,7 @@ OBJECTS_DIR = ./tmp
 
 #Note: This variable applies only to Windows targets.
 #Specifies where to copy the target dll.
-DLLDESTDIR = ./dll
+DLLDESTDIR =
 
 PYTHONPATH = 'D:/Programming/Python 3.6'
 NUMPYPATH = '$$PYTHONPATH/Lib/site-packages/numpy/core'

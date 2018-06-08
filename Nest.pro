@@ -7,13 +7,13 @@
 QT      +=  core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+CONFIG  +=  c++11 console
 CONFIG  -=  debug_and_release_target \
             debug_and_release
 
 TARGET = Nest
 
-TEMPLATE = app
+#TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -29,10 +29,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        widget.cpp
+    cpython.cpp
 
 HEADERS += \
-        widget.h
+    cpython.h \
+    header.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

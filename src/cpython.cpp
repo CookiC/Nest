@@ -88,12 +88,15 @@ bool CPython::inConvert(PyObject*& o, va_list& arg, const char*& p){
         o = PyFloat_FromDouble((double)va_arg(arg,float));
         break;
     case '[':{
+        //cout<<(LL)arg<<' '<<sizeof(int)+sizeof(LL*)*2<<' '<<(unsigned)*arg<<endl;
         const CPArray &a = va_arg(arg,CPArray);
+        //cout<<(LL)&a<<' '<<(LL)arg<<endl;
         NPY_TYPES type;
-        p += 2;
+        ++p;
         if(!npyType(*p,type))
             return false;
         o = PyArray_SimpleNewFromData(a.n, a.dim, type, a.data);
+        ++p;
         break;
     }
     default:
@@ -125,15 +128,17 @@ bool CPython::outConvert(PyObject* o, va_list& arg, const char*& p){
     case '[':{
         CPArray* a = va_arg(arg,CPArray*);
         NPY_TYPES type;
-        p += 2;
+        ++p;
         if(!npyType(*p,type))
             return false;
         PyArrayObject* pArray = (PyArrayObject*)o;
         getArray(a,pArray,type);
         Py_DECREF(pArray);
+        ++p;
         break;
     }
     default:
+        cout<<"Output format wrong! Has invalid character '"<<*p<<"'"<<endl;
         return false;
     }
     return true;
@@ -141,13 +146,13 @@ bool CPython::outConvert(PyObject* o, va_list& arg, const char*& p){
 
 void CPython::getArray(CPArray* a, PyArrayObject* p, NPY_TYPES t){
     a->n = p->nd;
-    a->dim = new long long[a->n];
-    memcpy(a->dim, p->dimensions, sizeof(int)*a->n);
+    a->dim = new LL[a->n];
+    memcpy(a->dim, p->dimensions, sizeof(void*)*a->n);
     int i;
     long long sum=1;
     for(i=0;i<a->n;++i)
         sum*=a->dim[i];
-    cout<<"numpy数组类型"<<p->descr->type<<"\n";
+    cout<<"numpy type "<<p->descr->type_num<<"\n";
     switch(t){
     case NPY_BOOL:
         a->data = new bool[sum];
@@ -190,7 +195,7 @@ bool CPython::call(const char* func,const char* para, const char* retu, ...){
   *     i       -int
   *     d       -double
   *     f       -float
-  *     []i      -int[]
+  *     [i]      -int[]
   * python返回值一律使用tuple类型
   */
     const char* pStr;
@@ -213,18 +218,12 @@ bool CPython::call(const char* func,const char* para, const char* retu, ...){
     }
 
     PyObject *pFunc = PyDict_GetItemString(pDict, func);
-    if(!pFunc)
-        return false;
-    if(!pPara)
-        cout<<"pPara is null!"<<endl;
+    if(!pFunc)  return false;
     PyObject *pRetu = PyObject_CallObject(pFunc, pPara);
-    if(!pRetu)
-        cout<<"Call object wrong!"<<endl;
-    if(pPara){
-        Py_DECREF(pPara);
-        cout<<"Release pPara!"<<endl;
-    }
-    Py_DECREF(pFunc);
+    if(pPara)   Py_DECREF(pPara);
+    if(pFunc)   Py_DECREF(pFunc);
+
+    if(!pRetu)  cout<<"Call object wrong!"<<endl;
     if(pRetu==Py_None&&retu[0]||pRetu!=Py_None&&!retu[0]){
         cout<<"The reverted parameter is inconsistent!";
         return false;
@@ -242,6 +241,7 @@ bool CPython::call(const char* func,const char* para, const char* retu, ...){
             }
             else{
                 //返回单个值
+                pStr=retu;
                 if(!outConvert(pRetu,arg,pStr))
                     return false;
             }
@@ -265,8 +265,18 @@ void* CPython::initNumpy(){
 void CPython::test(){
     open();
     //call("HelloWorld","","");
-    int a=1,b=2,c=0;
-    call("Add2","ii","i",a,b,c);
-    cout<<c<<endl;
+    int n=2;
+    LL dim[2]={3,3};
+    int data[3][3]={{1,1,2},{1,1,1},{1,1,1}};
+    CPArray out;
+    call("Sum1","[i]i","[i]",CPArray(n,dim,data),n,&out);
+    int sum=1;
+    int i;
+    cout<<out.n<<endl;
+    for(i=0;i<out.n;++i)
+        sum*=out.dim[i];
+    cout<<sum<<endl;
+    for(i=0;i<sum;++i)
+        cout<<((int*)out.data)[i]<<' ';
     close();
 }

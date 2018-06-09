@@ -5,14 +5,7 @@
 #include <arrayobject.h>
 #include <cstring>
 #include "header.h"
-
-class CPArray{
-public:
-    int n;
-    long long* dim;
-    void* data;
-    CPArray(int n, long long* dim, void* data):n(n),dim(dim),data(data) {}
-};
+#include "cparray.h"
 
 class CPython{
 public:

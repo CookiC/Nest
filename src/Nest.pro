@@ -29,11 +29,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    cpython.cpp
+    cpython.cpp \
+    cparray.cpp
 
 HEADERS += \
     cpython.h \
-    header.h
+    header.h \
+    cparray.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

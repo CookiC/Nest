@@ -30,3 +30,10 @@ def Add1(a,b):
 
 def Add2(a,b):
     return a+b
+
+def Sum1(a,b):
+    print(sum(a)+b)
+    return sum(a)+b
+
+if __name__ == '__main__':
+    print(np.array([[5,5,6],[1,1,1]],np.int32))

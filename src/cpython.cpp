@@ -146,7 +146,7 @@ bool CPython::outConvert(PyObject* o, va_list& arg, const char*& p){
 
 void CPython::getArray(CPArray* a, PyArrayObject* p, NPY_TYPES t){
     a->n = p->nd;
-    a->dim = new LL[a->n];
+    a->dim = new ll[a->n];
     memcpy(a->dim, p->dimensions, sizeof(void*)*a->n);
     int i;
     long long sum=1;
@@ -266,7 +266,7 @@ void CPython::test(){
     open();
     //call("HelloWorld","","");
     int n=2;
-    LL dim[2]={3,3};
+    ll dim[2]={3,3};
     int data[3][3]={{1,1,2},{1,1,1},{1,1,1}};
     CPArray out;
     call("Sum1","[i]i","[i]",CPArray(n,dim,data),n,&out);

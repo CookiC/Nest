@@ -1,13 +1,16 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define LL long long
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
 
-#include<iostream>
-#include<string>
-
+using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
 
+using ll = long long;
+using ull = unsigned long long;
 #endif // HEADER_H

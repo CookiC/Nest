@@ -36,4 +36,5 @@ def Sum1(a,b):
     return sum(a)+b
 
 if __name__ == '__main__':
-    print(np.array([[5,5,6],[1,1,1]],np.int32))
+    a = np.array([[5,5,6],[1,1,1]],np.int32)
+    print(a)

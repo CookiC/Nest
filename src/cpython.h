@@ -1,17 +1,20 @@
 #ifndef CPYTHON_H
 #define CPYTHON_H
 
+#include "header.h"
+#include "cparray.h"
+
 #include <Python.h>
 #include <arrayobject.h>
 #include <cstring>
-#include "header.h"
-#include "cparray.h"
+
 
 class CPython{
 public:
     static void open();
     static void close();
     static bool call(const char*, const char*, const char*, ...);
+
     static void test();
 
 private:

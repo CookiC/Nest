@@ -6,11 +6,11 @@
 class CPArray{
 public:
     int n;
-    long long* dim;
+    ll* dim;
     void* data;
 
     CPArray();
-    CPArray(int, long long*, void*);
+    CPArray(int, ll*, void*);
 };
 
 

@@ -9,126 +9,6 @@ public:
     string value;
     Node():up(nullptr),down(nullptr),left(nullptr),right(nullptr),value(""){}
     Node(string value):up(nullptr),down(nullptr),left(nullptr),right(nullptr),value(value){}
-
-    void insertDown(Node *M){
-        Node* const& U=this;
-        Node*& D=down;
-        Node*& L=down->left;
-        Node*& R=down->right;
-        M->up = U;
-        M->down = D;
-        M->left = L;
-        M->right = R;
-        U->down = M;
-        D->up = M;
-        L->right = M;
-        R->left = M;
-    }
-
-    void insertUp(Node *M){
-        Node*& U=up;
-        Node* const& D=this;
-        Node*& L=up->left;
-        Node*& R=up->right;
-        M->up = U;
-        M->down = D;
-        M->left = L;
-        M->right = R;
-        U->down = M;
-        D->up = M;
-        L->right = M;
-        R->left = M;
-    }
-
-    void insertRight(Node *M){
-        Node* const& L=this;
-        Node*& R=right;
-        Node*& U=right->up;
-        Node*& D=right->down;
-        M->up = U;
-        M->down = D;
-        M->left = L;
-        M->right = R;
-        U->down = M;
-        D->up = M;
-        L->right = M;
-        R->left = M;
-    }
-
-    void insertLeft(Node *M){
-        Node*& L=left;
-        Node* const& R=this;
-        Node*& U=left->up;
-        Node*& D=left->down;
-        M->up = U;
-        M->down = D;
-        M->left = L;
-        M->right = R;
-        U->down = M;
-        D->up = M;
-        L->right = M;
-        R->left = M;
-    }
-
-    void deleteDown(){
-        Node* M=this->down;
-        Node* U=M->up;
-        Node* D=M->down;
-        Node* L=M->left;
-        Node* R=M->right;
-        U->down = D;
-        L->right = D;
-        R->left = D;
-        D->up = U;
-        D->left = L;
-        D->right = R;
-        delete M;
-    }
-
-    void deleteUp(){
-        Node* M=this->up;
-        Node* U=M->up;
-        Node* D=M->down;
-        Node* L=M->left;
-        Node* R=M->right;
-        U->down = D;
-        L->right = D;
-        R->left = D;
-        D->up = U;
-        D->left = L;
-        D->right = R;
-        delete M;
-    }
-
-    void deleteRight(){
-        Node* M=this->right;
-        Node* U=M->up;
-        Node* D=M->down;
-        Node* L=M->left;
-        Node* R=M->right;
-        L->right = R;
-        U->down = R;
-        D->up = R;
-        R->left = L;
-        R->up = U;
-        R->down = D;
-        delete M;
-    }
-
-    void deleteLeft(){
-        Node* M=this->left;
-        Node* U=M->up;
-        Node* D=M->down;
-        Node* L=M->left;
-        Node* R=M->right;
-        L->right = R;
-        U->down = R;
-        D->up = R;
-        R->left = L;
-        R->up = U;
-        R->down = D;
-        delete M;
-    }
 };
 
 GenericData::GenericData(){
@@ -151,22 +31,66 @@ GenericData::~GenericData(){
         head->deleteLeft();
 }
 
-void GenericData::rowAppend(const string rowName){
+void GenericData::appendRowHead(const string rowName){
     Node* p = new Node(rowName);
     p->left = p;
     p->right = p;
-    head->insertUp(p);
+    p->up = head->up;
+    p->down = head;
+    p->up->down = p;
+    head->up = p;
     rowHead.push_back(p);
     numRow=(int)rowHead.size();
 }
 
-void GenericData::colAppend(const string colName){
+void GenericData::appendColHead(const string colName){
     Node* p = new Node(colName);
     p->up = p;
-    p->right = p;
-    head->insertLeft(p);
+    p->down = p;
+    p->left = head->left;
+    p->right = head->right;
+    p->left->right = p;
+    head->left = p;
     colHead.push_back(p);
     numCol=(int)colHead.size();
+}
+
+void GenericData::deleteRowHead(int index){
+    Node* p = rowHead[index];
+    for(int i=index;i<numRow;++i)
+        rowHead[i]=rowHead[i+1];
+    rowHead.pop_back();
+    numRow=(int)rowHead.size();
+    p->up->down = p->down;
+    p->down->up = p->up;
+    delete p;
+}
+
+bool GenericData::appendRow(const GenericList &row, const string name){
+    appendRowHead(name);
+    if(row.size()!=numCol)
+        return false;
+    Node* q;
+    Node* p=*rowHead.rbegin();
+    for(auto s:row){
+        q = new Node(s);
+        Node*& L = p->left;
+        Node*& R = p;
+        Node*& U = L->up->right;
+        Node*& D = L->down->right;
+        q->right = R;
+        q->left = L;
+        q->up = U;
+        q->down = D;
+        L->right = q;
+        R->left = q;
+        U->down = q;
+        D->up = q;
+    }
+}
+
+void GenericData::deleteRow(int i){
+
 }
 
 bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
@@ -183,7 +107,7 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
         val.clear();
         for(i=0;i<line.size();++i){
             if(line[i]==','){
-                colAppend(val);
+                appendColHead(val);
                 val.clear();
             }
             else if(line[i]=='"'){
@@ -193,18 +117,22 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
             else
                 val.push_back(line[i]);
         }
+        appendColHead(val);
     }
 
+    string rowName;
+    GenericList row;
     while(fileIn) {
         getline(fileIn,line);
         val.clear();
+        row.clear();
         if(rowNameFlag)
-            return false;//可添加处理代码
+            rowName="";//可添加处理代码
         else
-            rowAppend();
+            rowName="";
         for(i=0;i<line.size();++i){
             if(line[i]==','){
-                rowHead[numRow-1]->insertLeft(new Node(val));
+                row.push_back(val);
                 val.clear();
             }
             else if(line[i]=='"'){
@@ -214,6 +142,8 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
             else
                 val.push_back(line[i]);
         }
+        row.push_back(val);
+        appendRow(row,rowName);
     }
     cout<<"Load end!"<<endl;
     return true;
@@ -222,26 +152,27 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
 void GenericData::saveCsv(string filePath){
     using std::ofstream;
 
-    //ofstream cout(filePath);
+    ofstream fileOut(filePath);
     if(rowNameFlag)
-        cout<<',';
+        fileOut<<',';
     if(colNameFlag){
-        cout<<colHead[0]->value;
+        fileOut<<colHead[0]->value;
         for(int i=1;i<numCol;++i)
-            cout<<','<<colHead[i]->value;
+            fileOut<<','<<colHead[i]->value;
+        fileOut<<endl;
     }
-    system("pause");
     for(auto p:rowHead){
         if(rowNameFlag)
-            cout<<p->value<<',';
+            fileOut<<p->value<<',';
         Node* q=p->right;
-        cout<<q->value;
-        for(q=q->right;q!=p;q=q->right){
-            cout<<','<<q->value;
-            system("pause");
-        }
+        fileOut<<q->value;
+        for(q=q->right;q!=p;q=q->right)
+            if(q->value.find(',')==string::npos)
+                fileOut<<','<<q->value;
+            else
+                fileOut<<','<<'"'<<q->value<<'"';
+        fileOut<<endl;
     }
-    cout<<"Save end!"<<endl;
 }
 
 void GenericData::test(){

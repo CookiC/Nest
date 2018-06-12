@@ -298,12 +298,65 @@ void GenericData::colStrSplit(int index, const string& delimiter, bool repeat){
     p->value=name+'#'+std::to_string(i);
 }
 
+StandardData& GenericData::toStandardData(){
+    using StandardData::DataType;
+    using StandardData::NUM;
+    using StandardData::NOM;
+
+    int i,j;
+    Node *p;
+    StandardData *stdData=new StandardData(numRow, numCol);
+    DataType *type=stdData->type;
+    for(i=0;i<numCol;++i){
+        p=colHead[i];
+        type[i] = NUM;
+        for(j=0;j<numRow;++j){
+            if(type[i]==NUM&&!std::is_digit(p->value))
+                type[i]=NOM;
+            p=p->down;
+        }
+    }
+
+    QMap<string, int> m;
+    for(i=0;i<numCol;++i){
+        p=colHead[i];
+        if(type[i]==NUM){
+            for(j=0;j<numRow;++j){
+                if(p->value.empty()){
+                    stdData->isMissing[i][j]=true;
+                    stdData->data[i][j]=0;
+                }
+                else{
+                    stdData->isMissing[i][j]=false;
+                    stdData->data[i][j]=std::to_double(p->value);
+                }
+                p=p->down;
+            }
+        }
+        else{
+            m.clear();
+            for(j=0;j<numRow;++j){
+                stdData->isMissing[i][j]=true;
+                if(m.contains(p->value)){
+                    stdData->data[i][j]=m.value(p->value);
+                }
+                else{
+                    m.insert(p->value,m.size());
+                    stdData->data[i][j]=m.size();
+                }
+
+                p=p->down;
+            }
+        }
+    }
+}
+
 void GenericData::test(){
-    GenericData gData;
-    gData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv");
+    GenericData genData;
+    genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv");
     //gData.deleteCol("PassengerId");
-    gData.colStrSplit("Name",", ");
-    gData.colStrSplit("Name#1",". ");
-    gData.colStrSplit("Ticket"," ");
-    gData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");
+    genData.colStrSplit("Name",", ");
+    genData.colStrSplit("Name#1",". ");
+    genData.colStrSplit("Ticket"," ");
+    genData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");
 }

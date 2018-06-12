@@ -3,13 +3,18 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 #include <fstream>
+#include <QVector>
+#include <QMap>
 
-using std::vector;
 using std::string;
 using std::cout;
 using std::endl;
+
+namespace std {
+    bool is_digit(const string&);
+    double to_double(const string&);
+}
 
 using ll = long long;
 using ull = unsigned long long;

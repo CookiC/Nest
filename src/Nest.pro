@@ -33,7 +33,8 @@ SOURCES += \
     cparray.cpp \
     genericdata.cpp \
     standarddata.cpp \
-    strictdata.cpp
+    strictdata.cpp \
+    header.cpp
 
 HEADERS += \
     cpython.h \

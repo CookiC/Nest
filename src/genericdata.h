@@ -2,11 +2,14 @@
 #define GENERICDATA_H
 
 #include "header.h"
+#include "standarddata.h"
 
-using GenericList = vector<string>;
+using GenericList = QVector<string>;
 
 class GenericData{
 public:
+    friend class StandardData;
+
     GenericData();
     ~GenericData();
     bool loadCsv(string, bool=0, bool=1);
@@ -20,6 +23,7 @@ public:
     bool deleteCol(const string&);
     bool insertCol(int, const GenericList&, const string& = "");
     int getColIndex(const string&);
+    StandardData& toStandardData();
     static void test();
 
 private:
@@ -30,8 +34,8 @@ private:
     bool rowNameFlag;
     bool colNameFlag;
     Node* head;
-    vector<Node*> rowHead;
-    vector<Node*> colHead;
+    QVector<Node*> rowHead;
+    QVector<Node*> colHead;
 
     static void deleteNode(Node*);
 

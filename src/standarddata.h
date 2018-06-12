@@ -2,10 +2,20 @@
 #define STANDARDDATA_H
 
 
-class StandardData
-{
+class StandardData{
+    enum DataType{NUM,NOM};
 public:
-    StandardData();
+    StandardData(int, int);
+    ~StandardData();
+    int getNumRow();
+    int getNumCol();
+
+private:
+    int numRow;
+    int numCol;
+    DataType *type;
+    bool **isMissing;
+    double **data;
 };
 
 #endif // STANDARDDATA_H

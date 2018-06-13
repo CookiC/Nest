@@ -34,7 +34,7 @@ SOURCES += \
     genericdata.cpp \
     standarddata.cpp \
     strictdata.cpp \
-    header.cpp
+    nstring.cpp
 
 HEADERS += \
     cpython.h \
@@ -42,7 +42,8 @@ HEADERS += \
     cparray.h \
     genericdata.h \
     strictdata.h \
-    standarddata.h
+    standarddata.h \
+    nstring.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

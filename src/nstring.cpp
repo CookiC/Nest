@@ -1,8 +1,8 @@
-#include "header.h"
+#include "nstring.h"
 
-bool std::is_digit(const string& str){
+bool NString::isDigit(){
     int numPoint=0;
-    for(auto c:str)
+    for(auto c:*this)
         if(c=='.'){
             ++numPoint;
             if(numPoint>1)
@@ -13,7 +13,7 @@ bool std::is_digit(const string& str){
     return true;
 }
 
-double std::to_double(const string& str){
+double std::to_double(const QByteArray& str){
     double res=0;
     double div=1;
     for(auto c:str)

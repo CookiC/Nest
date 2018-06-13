@@ -2,19 +2,14 @@
 #define HEADER_H
 
 #include <iostream>
-#include <string>
 #include <fstream>
-#include <QVector>
+#include <QList>
 #include <QMap>
+#include <QString>
+#include <QStringList>
 
-using std::string;
 using std::cout;
 using std::endl;
-
-namespace std {
-    bool is_digit(const string&);
-    double to_double(const string&);
-}
 
 using ll = long long;
 using ull = unsigned long long;

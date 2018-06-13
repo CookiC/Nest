@@ -6,9 +6,9 @@ public:
     Node* down;
     Node* left;
     Node* right;
-    string value;
-    Node():up(nullptr),down(nullptr),left(nullptr),right(nullptr),value(""){}
-    Node(string value):up(nullptr),down(nullptr),left(nullptr),right(nullptr),value(value){}
+    QString str;
+    Node():up(nullptr),down(nullptr),left(nullptr),right(nullptr),str(""){}
+    Node(QString value):up(nullptr),down(nullptr),left(nullptr),right(nullptr),str(value){}
 };
 
 GenericData::GenericData(){
@@ -25,7 +25,7 @@ GenericData::GenericData(){
 GenericData::~GenericData(){
 }
 
-void GenericData::appendRowHead(const string& rowName){
+void GenericData::appendRowHead(const QString& rowName){
     Node* p = new Node(rowName);
     p->left = p;
     p->right = p;
@@ -59,20 +59,20 @@ void GenericData::deleteRow(int index){
     deleteRowHead(index);
 }
 
-bool GenericData::deleteRow(const string& name){
+bool GenericData::deleteRow(const QString& name){
     for(int i=0;i<numCol;++i)
-        if(rowHead[i]->value==name){
+        if(rowHead[i]->str==name){
             deleteRow(i);
             return true;
         }
     return true;
 }
 
-void GenericData::appendColHead(const string& name){
+void GenericData::appendColHead(const QString& name){
     InsertColHead(numCol,name);
 }
 
-void GenericData::InsertColHead(int index, const string &name){
+void GenericData::InsertColHead(int index, const QString &name){
     Node *q;
     if(index<numCol)
         q=colHead[index];
@@ -116,14 +116,14 @@ void GenericData::deleteCol(int index){
     deleteColHead(index);
 }
 
-int GenericData::getColIndex(const string& name){
+int GenericData::getColIndex(const QString& name){
     for(int i=0;i<numCol;++i)
-        if(colHead[i]->value==name)
+        if(colHead[i]->str==name)
             return i;
     return -1;
 }
 
-bool GenericData::deleteCol(const string& name){
+bool GenericData::deleteCol(const QString& name){
     int i=getColIndex(name);
     if(i<0)
         return false;
@@ -131,7 +131,7 @@ bool GenericData::deleteCol(const string& name){
     return true;
 }
 
-bool GenericData::appendRow(const GenericList &row, const string& name){
+bool GenericData::appendRow(const QStringList &row, const QString& name){
     if(row.size()!=numCol)
         return false;
     appendRowHead(name);
@@ -155,7 +155,7 @@ bool GenericData::appendRow(const GenericList &row, const string& name){
     return true;
 }
 
-bool GenericData::insertCol(int index, const GenericList &col, const string &name){
+bool GenericData::insertCol(int index, const QStringList &col, const QString &name){
     if(col.size()!=numRow)
         return false;
     InsertColHead(index, name);
@@ -179,14 +179,14 @@ bool GenericData::insertCol(int index, const GenericList &col, const string &nam
     return true;
 }
 
-bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
+bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
     using std::ifstream;
     using std::getline;
 
     rowNameFlag = hasRowName;
     colNameFlag = hasColName;
     ifstream fileIn(filePath);
-    string line,val;
+    QString line,val;
     int i;
     if(fileIn&&colNameFlag){
         getline(fileIn,line);
@@ -206,8 +206,8 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
         appendColHead(val);
     }
 
-    string rowName;
-    GenericList row;
+    QString rowName;
+    QStringList row;
     while(fileIn) {
         getline(fileIn,line);
         val.clear();
@@ -235,44 +235,44 @@ bool GenericData::loadCsv(string filePath, bool hasRowName, bool hasColName){
     return true;
 }
 
-void GenericData::saveCsv(string filePath){
+void GenericData::saveCsv(QString filePath){
     using std::ofstream;
 
     ofstream fileOut(filePath);
     if(rowNameFlag)
         fileOut<<',';
     if(colNameFlag){
-        fileOut<<colHead[0]->value;
+        fileOut<<colHead[0]->str;
         for(int i=1;i<numCol;++i)
-            fileOut<<','<<colHead[i]->value;
+            fileOut<<','<<colHead[i]->str;
         fileOut<<endl;
     }
     for(auto p:rowHead){
         if(rowNameFlag)
             fileOut<<p->value<<',';
         Node* q=p->right;
-        fileOut<<q->value;
+        fileOut<<q->str;
         for(q=q->right;q!=p;q=q->right)
-            if(q->value.find(',')==string::npos)
-                fileOut<<','<<q->value;
+            if(q->str.find(',')==QString::npos)
+                fileOut<<','<<q->str;
             else
-                fileOut<<','<<'"'<<q->value<<'"';
+                fileOut<<','<<'"'<<q->str<<'"';
         fileOut<<endl;
     }
 }
 
-void GenericData::colStrSplit(const string& name, const string& delimiter, bool repeat){
+void GenericData::colStrSplit(const QString& name, const QString& delimiter, bool repeat){
     int i=getColIndex(name);
     if(i<0)
         return;
     colStrSplit(i,delimiter);
 }
 
-void GenericData::colStrSplit(int index, const string& delimiter, bool repeat){
-    string name=colHead[index]->value;
+void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
+    QString name=colHead[index]->str;
     bool canSplit;
     Node *q,*p;
-    GenericList l;
+    QStringList l;
     int i,j,k=(int)delimiter.size();
 
     i=0;
@@ -281,13 +281,13 @@ void GenericData::colStrSplit(int index, const string& delimiter, bool repeat){
         l.clear();
         p=colHead[i+index];
         for(q=p->down;q!=p;q=q->down){
-           j=(int)q->value.find(delimiter);
-           if(j==string::npos)
+           j=(int)q->str.find(delimiter);
+           if(j==QString::npos)
                l.push_back("");
            else{
                canSplit=true;
-               l.push_back(q->value.substr(0,j));
-               q->value.erase(0,j+k);
+               l.push_back(q->str.substr(0,j));
+               q->str.erase(0,j+k);
            }
         }
         if(canSplit){
@@ -295,7 +295,7 @@ void GenericData::colStrSplit(int index, const string& delimiter, bool repeat){
             ++i;
         }
     }while(canSplit&&repeat);
-    p->value=name+'#'+std::to_string(i);
+    p->str=name+'#'+std::to_string(i);
 }
 
 StandardData& GenericData::toStandardData(){
@@ -303,48 +303,50 @@ StandardData& GenericData::toStandardData(){
     using StandardData::NUM;
     using StandardData::NOM;
 
+    bool ok;
     int i,j;
     Node *p;
     StandardData *stdData=new StandardData(numRow, numCol);
+
+    //主要完成以下数据的转换
     DataType *type=stdData->type;
+    double **data=stdData->data;
+    bool **missing=stdData->missing;
+    QStringList *nomName=stdData->nomName;
+
+    //检测数据类型，是否缺失，并完成连续值类型的转换
     for(i=0;i<numCol;++i){
         p=colHead[i];
-        type[i] = NUM;
+        type[i]=NUM;
         for(j=0;j<numRow;++j){
-            if(type[i]==NUM&&!std::is_digit(p->value))
-                type[i]=NOM;
+            if(p->str.isEmpty())
+                missing[i][j]=true;
+            else{
+                missing[i][j]=false;
+                if(type[i]==NUM){
+                    data[i][j]=p->str.toDouble(&ok);
+                    if(!ok)
+                        type[i]=NOM;
+                }
+            }
             p=p->down;
         }
     }
 
-    QMap<string, int> m;
+    //对每一类nom添加数字标签（ID）
+    QMap<QString, int> m;
     for(i=0;i<numCol;++i){
         p=colHead[i];
-        if(type[i]==NUM){
-            for(j=0;j<numRow;++j){
-                if(p->value.empty()){
-                    stdData->isMissing[i][j]=true;
-                    stdData->data[i][j]=0;
-                }
-                else{
-                    stdData->isMissing[i][j]=false;
-                    stdData->data[i][j]=std::to_double(p->value);
-                }
-                p=p->down;
-            }
-        }
-        else{
+        if(type[i]==NOM){
             m.clear();
             for(j=0;j<numRow;++j){
-                stdData->isMissing[i][j]=true;
-                if(m.contains(p->value)){
-                    stdData->data[i][j]=m.value(p->value);
-                }
+                if(m.contains(p->str))
+                    data[i][j]=m.value(p->str);
                 else{
-                    m.insert(p->value,m.size());
-                    stdData->data[i][j]=m.size();
+                    data[i][j]=m.size();
+                    nomName[j].push_back(p->str);
+                    m.insert(p->str,m.size());
                 }
-
                 p=p->down;
             }
         }

@@ -4,25 +4,23 @@
 #include "header.h"
 #include "standarddata.h"
 
-using GenericList = QVector<string>;
-
 class GenericData{
 public:
     friend class StandardData;
 
     GenericData();
     ~GenericData();
-    bool loadCsv(string, bool=0, bool=1);
-    void saveCsv(string);
-    bool appendRow(const GenericList&, const string& = "");
-    void colStrSplit(int, const string&, bool=false);
-    void colStrSplit(const string&, const string&, bool=false);
+    bool loadCsv(QString, bool=0, bool=1);
+    void saveCsv(QString);
+    bool appendRow(const QStringList&, const QString& = "");
+    void colStrSplit(int, const QString&, bool=false);
+    void colStrSplit(const QString&, const QString&, bool=false);
     void deleteRow(int);
     void deleteCol(int);
-    bool deleteRow(const string&);
-    bool deleteCol(const string&);
-    bool insertCol(int, const GenericList&, const string& = "");
-    int getColIndex(const string&);
+    bool deleteRow(const QString&);
+    bool deleteCol(const QString&);
+    bool insertCol(int, const QStringList&, const QString& = "");
+    int getColIndex(const QString&);
     StandardData& toStandardData();
     static void test();
 
@@ -34,16 +32,16 @@ private:
     bool rowNameFlag;
     bool colNameFlag;
     Node* head;
-    QVector<Node*> rowHead;
-    QVector<Node*> colHead;
+    QList<Node*> rowHead;
+    QList<Node*> colHead;
 
     static void deleteNode(Node*);
 
-    void appendColHead(const string& = "");
-    void appendRowHead(const string& = "");
+    void appendColHead(const QString& = "");
+    void appendRowHead(const QString& = "");
     void deleteColHead(int);
     void deleteRowHead(int);
-    void InsertColHead(int, const string& = "");
+    void InsertColHead(int, const QString& = "");
 
 };
 

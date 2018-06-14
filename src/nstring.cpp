@@ -13,10 +13,10 @@ bool NString::isDigit(){
     return true;
 }
 
-double std::to_double(const QByteArray& str){
+double NString::toDouble(){
     double res=0;
     double div=1;
-    for(auto c:str)
+    for(auto c:*this)
         if(c=='.')
             div=10;
         else{

@@ -3,10 +3,13 @@
 
 #include "header.h"
 #include "strictdata.h"
+#include "genericdata.h"
 
 class StandardData: public StrictData{
-    enum DataType{NUM,NOM};
+    friend class GenericData;
+
 public:
+    enum DataType{NUM,NOM};
     StandardData(int, int);
     ~StandardData();
 

@@ -180,16 +180,15 @@ bool GenericData::insertCol(int index, const QStringList &col, const QString &na
 }
 
 bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
-    using std::ifstream;
-    using std::getline;
-
     rowNameFlag = hasRowName;
     colNameFlag = hasColName;
-    ifstream fileIn(filePath);
-    QString line,val;
+
+    QFile fileIn(filePath);
+    QByteArray line,val;
+    fileIn.open(QIODevice::ReadOnly | QIODevice::Text);
     int i;
-    if(fileIn&&colNameFlag){
-        getline(fileIn,line);
+    if(fileIn.isOpen()&&colNameFlag){
+        line=fileIn.readLine();
         val.clear();
         for(i=0;i<line.size();++i){
             if(line[i]==','){
@@ -208,12 +207,12 @@ bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
 
     QString rowName;
     QStringList row;
-    while(fileIn) {
-        getline(fileIn,line);
+    while(!fileIn.atEnd()) {
+        line=fileIn.readLine();
         val.clear();
         row.clear();
         if(rowNameFlag)
-            rowName="";//可添加处理代码
+            rowName="一二三";
         else
             rowName="";
         for(i=0;i<line.size();++i){
@@ -231,33 +230,34 @@ bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
         row.push_back(val);
         appendRow(row,rowName);
     }
+    fileIn.close();
     cout<<"Load end!"<<endl;
     return true;
 }
 
 void GenericData::saveCsv(QString filePath){
-    using std::ofstream;
-
-    ofstream fileOut(filePath);
+    QFile file(filePath);
+    file.open(QIODevice::WriteOnly|QIODevice::Text);
+    QTextStream out(&file);
     if(rowNameFlag)
-        fileOut<<',';
+        out<<',';
     if(colNameFlag){
-        fileOut<<colHead[0]->str;
+        out<<colHead[0]->str;
         for(int i=1;i<numCol;++i)
-            fileOut<<','<<colHead[i]->str;
-        fileOut<<endl;
+            out<<','<<colHead[i]->str;
+        out<<'\n';
     }
     for(auto p:rowHead){
         if(rowNameFlag)
-            fileOut<<p->value<<',';
+            out<<p->str<<',';
         Node* q=p->right;
-        fileOut<<q->str;
+        out<<q->str;
         for(q=q->right;q!=p;q=q->right)
-            if(q->str.find(',')==QString::npos)
-                fileOut<<','<<q->str;
+            if(q->str.contains(','))
+                out<<','<<'"'<<q->str<<'"';
             else
-                fileOut<<','<<'"'<<q->str<<'"';
-        fileOut<<endl;
+                out<<','<<q->str;
+        out<<'\n';
     }
 }
 
@@ -265,7 +265,7 @@ void GenericData::colStrSplit(const QString& name, const QString& delimiter, boo
     int i=getColIndex(name);
     if(i<0)
         return;
-    colStrSplit(i,delimiter);
+    colStrSplit(i,delimiter,repeat);
 }
 
 void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
@@ -273,7 +273,7 @@ void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
     bool canSplit;
     Node *q,*p;
     QStringList l;
-    int i,j,k=(int)delimiter.size();
+    int i,j,k=delimiter.size();
 
     i=0;
     do{
@@ -281,63 +281,57 @@ void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
         l.clear();
         p=colHead[i+index];
         for(q=p->down;q!=p;q=q->down){
-           j=(int)q->str.find(delimiter);
-           if(j==QString::npos)
+           j=q->str.indexOf(delimiter);
+           if(j==-1)
                l.push_back("");
            else{
                canSplit=true;
-               l.push_back(q->str.substr(0,j));
-               q->str.erase(0,j+k);
+               l.push_back(q->str.left(j));
+               q->str.remove(0,j+k);
            }
         }
         if(canSplit){
-            insertCol(i+index,l,name+'#'+std::to_string(i));
+            insertCol(i+index,l,name+'#'+QString::number(i));
             ++i;
         }
     }while(canSplit&&repeat);
-    p->str=name+'#'+std::to_string(i);
+    p->str=name+'#'+QString::number(i);
 }
 
-StandardData& GenericData::toStandardData(){
-    using StandardData::DataType;
-    using StandardData::NUM;
-    using StandardData::NOM;
-
+StandardData* GenericData::toStandardData(){
     bool ok;
     int i,j;
     Node *p;
     StandardData *stdData=new StandardData(numRow, numCol);
 
-    //主要完成以下数据的转换
-    DataType *type=stdData->type;
+    StandardData::DataType *type=stdData->type;
     double **data=stdData->data;
     bool **missing=stdData->missing;
     QStringList *nomName=stdData->nomName;
 
-    //检测数据类型，是否缺失，并完成连续值类型的转换
     for(i=0;i<numCol;++i){
         p=colHead[i];
-        type[i]=NUM;
+        type[i]=StandardData::NUM;
         for(j=0;j<numRow;++j){
             if(p->str.isEmpty())
                 missing[i][j]=true;
             else{
                 missing[i][j]=false;
-                if(type[i]==NUM){
+                if(type[i]==StandardData::NUM){
                     data[i][j]=p->str.toDouble(&ok);
                     if(!ok)
-                        type[i]=NOM;
+                        type[i]=StandardData::NOM;
                 }
             }
             p=p->down;
         }
     }
 
-    //对每一类nom添加数字标签（ID）
     QMap<QString, int> m;
+    m.clear();
     for(i=0;i<numCol;++i){
         p=colHead[i];
-        if(type[i]==NOM){
+        if(type[i]==StandardData::NOM){
             m.clear();
             for(j=0;j<numRow;++j){
                 if(m.contains(p->str))
@@ -351,6 +345,7 @@ StandardData& GenericData::toStandardData(){
             }
         }
     }
+    return stdData;
 }
 
 void GenericData::test(){

@@ -4,10 +4,10 @@
 #include "header.h"
 #include "standarddata.h"
 
+class StandardData;
+
 class GenericData{
 public:
-    friend class StandardData;
-
     GenericData();
     ~GenericData();
     bool loadCsv(QString, bool=0, bool=1);
@@ -21,7 +21,8 @@ public:
     bool deleteCol(const QString&);
     bool insertCol(int, const QStringList&, const QString& = "");
     int getColIndex(const QString&);
-    StandardData& toStandardData();
+    StandardData* toStandardData();
+
     static void test();
 
 private:

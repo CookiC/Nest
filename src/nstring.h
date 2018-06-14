@@ -6,6 +6,7 @@
 class NString:public std::string{
 public:
     bool isDigit();
+    double toDouble();
 };
 
 #endif // NSTRING_H

@@ -12,10 +12,10 @@ StrictData::~StrictData(){
     delete[] data;
 }
 
-StrictData::getNumRow(){
+int StrictData::getNumRow(){
     return numRow;
 }
 
-StrictData::getNumCol(){
+int StrictData::getNumCol(){
     return numCol;
 }

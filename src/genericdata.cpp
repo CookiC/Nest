@@ -390,8 +390,6 @@ void GenericData::test(){
     genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv");
     //genData.deleteCol("PassengerId");
     //genData.colStrSplit("Name",", ");
-    //genData.colStrSplit("Name#1",". ");
-    //genData.colStrSplit("Ticket",QRegularExpression(" "));
-    genData.colStrSplit("Name",QRegularExpression(",|\\. "));
+    //genData.colStrSplit("Ticket"," ");
     genData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");
 }

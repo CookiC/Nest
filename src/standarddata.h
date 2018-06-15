@@ -1,4 +1,4 @@
-#ifndef STANDARDDATA_H
+﻿#ifndef STANDARDDATA_H
 #define STANDARDDATA_H
 
 #include "header.h"
@@ -9,6 +9,7 @@ class StandardData: public StrictData{
     friend class GenericData;
 
 public:
+    //数据类型分为连续型和离散型
     enum DataType{NUM,NOM};
     StandardData(int, int);
     ~StandardData();

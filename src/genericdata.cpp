@@ -1,4 +1,4 @@
-#include "genericdata.h"
+﻿#include "genericdata.h"
 
 class GenericData::Node{
 public:
@@ -190,17 +190,17 @@ bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
     if(fileIn.isOpen()&&colNameFlag){
         line=fileIn.readLine();
         val.clear();
-        for(i=0;i<line.size();++i){
+        for(i=0;i<line.size()-1;++i){
             if(line[i]==','){
                 appendColHead(val);
                 val.clear();
             }
             else if(line[i]=='"'){
                 for(++i;line[i]!='"'&&i<line.size();++i)
-                    val.push_back(line[i]);
+                    val.append(line[i]);
             }
             else
-                val.push_back(line[i]);
+                val.append(line[i]);
         }
         appendColHead(val);
     }
@@ -215,19 +215,19 @@ bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
             rowName="一二三";
         else
             rowName="";
-        for(i=0;i<line.size();++i){
+        for(i=0;i<line.size()-1;++i){
             if(line[i]==','){
                 row.push_back(val);
                 val.clear();
             }
             else if(line[i]=='"'){
                 for(++i;line[i]!='"'&&i<line.size();++i)
-                    val.push_back(line[i]);
+                    val.append(line[i]);
             }
             else
-                val.push_back(line[i]);
+                val.append(line[i]);
         }
-        row.push_back(val);
+        row.append(val);
         appendRow(row,rowName);
     }
     fileIn.close();
@@ -268,6 +268,13 @@ void GenericData::colStrSplit(const QString& name, const QString& delimiter, boo
     colStrSplit(i,delimiter,repeat);
 }
 
+void GenericData::colStrSplit(const QString& name, const QRegularExpression &regExp){
+    int i=getColIndex(name);
+    if(i<0)
+        return;
+    colStrSplit(i, regExp);
+}
+
 void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
     QString name=colHead[index]->str;
     bool canSplit;
@@ -296,6 +303,36 @@ void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
         }
     }while(canSplit&&repeat);
     p->str=name+'#'+QString::number(i);
+}
+
+void GenericData::colStrSplit(int index, const QRegularExpression &regExp){
+    QString name = colHead[index]->str;
+    Node *h,*p;
+    QStringList *row = new QStringList[numRow];
+    QStringList col;
+    int i,j,size=0;
+
+    h=colHead[index];
+    i=0;
+    for(p=h->down;p!=h;p=p->down){
+        row[i] = p->str.split(regExp);
+        if(row[i].size()>size)
+            size = row[i].size();
+        ++i;
+    }
+    deleteCol(index);
+
+    for(i=0;i<size;++i){
+        col.clear();
+        for(j=0;j<numRow;++j){
+            if(row[j].size()-size+i>=0)
+                col.append(row[j][row[j].size()-size+i]);
+            else
+                col.append("");
+            qDebug()<<*col.rbegin()<<',';
+        }
+        insertCol(index+i,col,name+"#"+QString::number(i));
+    }
 }
 
 StandardData* GenericData::toStandardData(){
@@ -351,9 +388,10 @@ StandardData* GenericData::toStandardData(){
 void GenericData::test(){
     GenericData genData;
     genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv");
-    //gData.deleteCol("PassengerId");
-    genData.colStrSplit("Name",", ");
-    genData.colStrSplit("Name#1",". ");
-    genData.colStrSplit("Ticket"," ");
+    //genData.deleteCol("PassengerId");
+    //genData.colStrSplit("Name",", ");
+    //genData.colStrSplit("Name#1",". ");
+    //genData.colStrSplit("Ticket",QRegularExpression(" "));
+    genData.colStrSplit("Name",QRegularExpression(",|\\. "));
     genData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");
 }

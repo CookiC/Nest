@@ -1,11 +1,13 @@
-#ifndef HEADER_H
+﻿#ifndef HEADER_H
 #define HEADER_H
 
 #include <iostream>
 #include <QByteArray>
+#include <QDebug>
 #include <QFile>
 #include <QList>
 #include <QMap>
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>

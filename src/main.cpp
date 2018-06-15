@@ -1,7 +1,7 @@
-#include "cpython.h"
+﻿#include "cpython.h"
 #include "genericdata.h"
 
 int main(int argc, char *argv[]){
-    int i;
+    GenericData::test();
     return 0;
 }

@@ -7,10 +7,9 @@
 ### Ash v1.12
 
 1. 取消了StrictData类
-2. 取消了GenericData类与StandardData类中的行名
-3. 重写了Standard类的构造和析构函数
-4. 完善了Nest文档
-5. 测试了GenericData::load_csv与GenericData::save_csv函数，应该没有问题了
+2. 重写了Standard类的构造和析构函数
+3. 完善了Nest文档
+4. 测试了GenericData::load_csv与GenericData::save_csv函数，应该没有问题了
 
 ## Data Classes
 
@@ -18,11 +17,53 @@
 
 使用十字循环链表作为基础数据存储结构，插入行列的复杂度为O(N+M)，N为行数，M为列数，每个节点存储的是字符串，将支持csv、arff的读入与保存。需开发arff文件读入。
 
+#### private
+
+* **bool colNameFlag**
+
+  是否有列名的标志
+
+* **bool rowNameFlag**
+
+  是否有行名的标志
+
+* **Node \*head**
+
+  *rowHead*与*colHead*的头指针,可存储行名的名字。
+
+* **QList<Node\*> colHead**
+
+  列头数组，指向列头节点，colHead[0]->str为列名，colHead[0]->down->str为第0行第0个字符串元素。
+  
+* **QList<Node\*> rowHead**
+
+  行头数组，指向行头节点，rowHead[0]->str为行名，rowHead[0]->right->str为第0行第0个字符串元素。
+
+* **void appendColHead(const QString &colName = "")**
+
+  向列头数组尾部添加列头（列名）
+
+* **void appendRowHead(const QString &colName = "")**
+
+  向行头数组尾部添加行头（行名）
+
+* **void deleteColHead(int index)**
+
+  删除列头，并释放内存
+
+* **void deleteRowHead(int index)**
+
+  删除行头，并释放内存
+
+* **void InsertColHead(int index, const QString &name = "")**
+
+  在*index*位置插入列头
+
 #### public
 
-* **bool appendRow(const QStringList &)**
+* **bool appendRow(const QStringList &row, const QString &name = "")**
 
-  向尾部添加行（行数据），返回是否添加成功。
+  向尾部添加行（行数据，行名），返回是否添加成功。
 
 * **void colStrSplit(int index, const QRegularExpression &regExp)**
 
@@ -56,7 +97,7 @@
 
   插入列（列索引，列数据，列名）。
 
-* **bool loadCsv(QString filePath, bool hasColName)**
+* **bool loadCsv(QString filePath, bool hasColName， bool hasRowName)**
 
   载入csv文件（文件名及路径，是否有列名）
 
@@ -64,35 +105,10 @@
 
   保存csv文件（文件名及路径）
 
-#### private
+* **StandardData* toStandardData()**
 
-* **QList<Node\*> rowHead**
+  将字符串转化为数字，能成功转化的判定为连续值，失败的判定为离散值，添加索引并记录；统计是否有缺失值，字符串为空即判定为缺失。
 
-  列头数组，指向列名节点，例，rowHead[0]->str为列名，rowHead[0]->down->str为第0行第0个字符串元素。
-
-* **QList<Node\*> colHead**
-
-  行头指针，指向每行第0个元素，例colHead[0]->str为第0行第0个字符串元素。
-
-* **void appendColHead(const QString &colName = "")**
-
-  向列头数组尾部添加列头（列名）
-
-* **void appendRowHead(const QString &str = "")**
-
-  向行头数组尾部添加行头（第0列字符串元素）
-
-* **void deleteColHead(int index)**
-
-  删除列头，并释放内存
-
-* **void deleteRowHead(int index)**
-
-  删除行头，并释放内存
-
-* **void InsertColHead(int index, const QString &name = "")**
-
-  在*index*位置插入列头
 
 ### StandardData
 

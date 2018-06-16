@@ -11,7 +11,7 @@ public:
     GenericData();
     ~GenericData();
 
-    bool appendRow(const QStringList &);
+    bool appendRow(const QStringList &, const QString & = "");
     void colStrSplit(const QString &, const QRegularExpression &);
     void colStrSplit(const QString &, const QString&, bool=false);
     void colStrSplit(int, const QRegularExpression &);
@@ -22,7 +22,7 @@ public:
     bool deleteCol(const QString&);
     int getColIndex(const QString&);
     bool insertCol(int, const QStringList&, const QString& = "");
-    bool loadCsv(QString, bool=1);
+    bool loadCsv(QString, bool=1, bool=0);
     void saveCsv(QString);
     StandardData* toStandardData();
 
@@ -34,6 +34,7 @@ private:
     int numRow;
     int numCol;
     bool colNameFlag;
+    bool rowNameFlag;
     Node* head;
     QList<Node*> rowHead;
     QList<Node*> colHead;

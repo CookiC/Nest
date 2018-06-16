@@ -13,15 +13,15 @@ public:
     Node(QString value):up(nullptr),down(nullptr),left(nullptr),right(nullptr),str(value){}
 };
 
-void GenericData::appendRowHead(const QString& str){
-    Node* p = new Node(str);
+void GenericData::appendRowHead(const QString& name){
+    Node* p = new Node(name);
     p->left = p;
     p->right = p;
     p->up = head->up;
     p->down = head;
     p->up->down = p;
     head->up = p;
-    rowHead.push_back(p);
+    rowHead.append(p);
     numRow=(int)rowHead.size();
 }
 
@@ -33,7 +33,7 @@ void GenericData::deleteColHead(int index){
     Node* p = colHead[index];
     for(int i=index;i<numCol;++i)
         colHead[i]=colHead[i+1];
-    colHead.pop_back();
+    colHead.removeLast();
     numCol=(int)colHead.size();
     p->left->right = p->right;
     p->right->left = p->left;
@@ -44,7 +44,7 @@ void GenericData::deleteRowHead(int index){
     Node* p = rowHead[index];
     for(int i=index;i<numRow;++i)
         rowHead[i]=rowHead[i+1];
-    rowHead.pop_back();
+    rowHead.removeLast();
     numRow=(int)rowHead.size();
     p->up->down = p->down;
     p->down->up = p->up;
@@ -89,14 +89,14 @@ GenericData::GenericData(){
 GenericData::~GenericData(){
 }
 
-bool GenericData::appendRow(const QStringList &row){
+bool GenericData::appendRow(const QStringList &row, const QString &name){
     if(row.size()!=numCol)
         return false;
-    appendRowHead(row[0]);
+    appendRowHead(name);
     Node *q,*U,*R,*L,*D;
     Node *p=*rowHead.rbegin();
-    for(int i=1;i<row.size();++i){
-        q = new Node(row[i]);
+    for(auto s:row){
+        q = new Node(s);
         L = p->left;
         R = p;
         U = L->up->right;
@@ -258,17 +258,27 @@ bool GenericData::insertCol(int index, const QStringList &col, const QString &na
     return true;
 }
 
-bool GenericData::loadCsv(QString filePath, bool hasColName){
+bool GenericData::loadCsv(QString filePath, bool hasColName, bool hasRowName){
     colNameFlag = hasColName;
-
+    rowNameFlag = hasRowName;
     QFile fileIn(filePath);
-    QByteArray line,val;
+    QByteArray line,val,rowName="";
     fileIn.open(QIODevice::ReadOnly | QIODevice::Text);
     int i;
     if(fileIn.isOpen()&&colNameFlag){
         line=fileIn.readLine();
+        i=0;
+        if(rowNameFlag){
+            rowName.clear();
+            while(line[i]!=','&&i<line.size()-1){
+                rowName.append(line[i]);
+                ++i;
+            }
+            head->str = rowName;
+            ++i;
+        }
         val.clear();
-        for(i=0;i<line.size()-1;++i){
+        while(i<line.size()-1){
             if(line[i]==','){
                 appendColHead(val);
                 val.clear();
@@ -279,16 +289,27 @@ bool GenericData::loadCsv(QString filePath, bool hasColName){
             }
             else
                 val.append(line[i]);
+            ++i;
         }
         appendColHead(val);
     }
-
+    cout<<"Colhead load Success!"<<endl;
     QStringList row;
     while(!fileIn.atEnd()) {
         line=fileIn.readLine();
+        i=0;
+        if(rowNameFlag){
+            rowName.clear();
+            while(line[i]!=','&&i<line.size()-1){
+                rowName.append(line[i]);
+                ++i;
+            }
+            head->str = rowName;
+            ++i;
+        }
         val.clear();
         row.clear();
-        for(i=0;i<line.size()-1;++i){
+        while(i<line.size()-1){
             if(line[i]==','){
                 row.push_back(val);
                 val.clear();
@@ -299,9 +320,10 @@ bool GenericData::loadCsv(QString filePath, bool hasColName){
             }
             else
                 val.append(line[i]);
+            ++i;
         }
         row.append(val);
-        appendRow(row);
+        appendRow(row,rowName);
     }
     fileIn.close();
     cout<<"Load Success!"<<endl;
@@ -313,13 +335,17 @@ void GenericData::saveCsv(QString filePath){
     file.open(QIODevice::WriteOnly|QIODevice::Text);
     QTextStream out(&file);
     if(colNameFlag){
+        if(rowNameFlag)
+            out<<',';
         out<<colHead[0]->str;
         for(int i=1;i<numCol;++i)
             out<<','<<colHead[i]->str;
         out<<'\n';
     }
     for(auto p:rowHead){
-        Node* q=p;
+        if(rowNameFlag)
+            out<<p->str<<',';
+        Node* q=p->right;
         out<<q->str;
         for(q=q->right;q!=p;q=q->right)
             if(q->str.contains(','))
@@ -382,8 +408,7 @@ StandardData* GenericData::toStandardData(){
 
 void GenericData::test(){
     GenericData genData;
-    genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv");
-    //genData.deleteCol("PassengerId");
+    genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv",1,1);
     //genData.colStrSplit("Name",", ");
     //genData.colStrSplit("Ticket"," ");
     genData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");

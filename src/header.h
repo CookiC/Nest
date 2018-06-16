@@ -12,6 +12,8 @@
 #include <QStringList>
 #include <QTextStream>
 
+#define deb qDebug()
+
 using std::cout;
 using std::endl;
 using std::string;

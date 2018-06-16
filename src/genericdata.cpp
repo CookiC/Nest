@@ -137,7 +137,6 @@ void GenericData::colStrSplit(int index, const QRegularExpression &regExp){
                 col.append(row[j][row[j].size()-size+i]);
             else
                 col.append("");
-            qDebug()<<*col.rbegin()<<',';
         }
         insertCol(index+i,col,name+"#"+QString::number(i));
     }
@@ -354,6 +353,7 @@ void GenericData::saveCsv(QString filePath){
                 out<<','<<q->str;
         out<<'\n';
     }
+    file.close();
 }
 
 StandardData* GenericData::toStandardData(){
@@ -362,54 +362,61 @@ StandardData* GenericData::toStandardData(){
     Node *p;
     StandardData *stdData=new StandardData(numRow, numCol);
 
+    if(colNameFlag)
+        for(i=0;i<numCol;++i)
+            stdData->colName.append(colHead[i]->str);
+    if(rowNameFlag)
+        for(i=0;i<numRow;++i)
+            stdData->rowName.append(rowHead[i]->str);
+
     StandardData::DataType *type=stdData->type;
     double **data=stdData->data;
     bool **missing=stdData->missing;
     QStringList *nomName=stdData->nomName;
 
-    for(i=0;i<numCol;++i){
-        p=colHead[i];
-        type[i]=StandardData::NUM;
-        for(j=0;j<numRow;++j){
+    for(j=0;j<numCol;++j){
+        p=colHead[j]->down;
+        type[j]=StandardData::NUM;
+        for(i=0;i<numRow;++i){
             if(p->str.isEmpty())
                 missing[i][j]=true;
             else{
                 missing[i][j]=false;
-                if(type[i]==StandardData::NUM){
+                if(type[j]==StandardData::NUM){
                     data[i][j]=p->str.toDouble(&ok);
                     if(!ok)
-                        type[i]=StandardData::NOM;
+                        type[j]=StandardData::NOM;
                 }
             }
             p=p->down;
         }
     }
-
     QMap<QString, int> m;
-    m.clear();
-    for(i=0;i<numCol;++i){
-        p=colHead[i];
-        if(type[i]==StandardData::NOM){
+    for(j=0;j<numCol;++j){
+        p=colHead[j];
+        if(type[j]==StandardData::NOM){
             m.clear();
-            for(j=0;j<numRow;++j){
+            for(i=0;i<numRow;++i){
                 if(m.contains(p->str))
                     data[i][j]=m.value(p->str);
                 else{
                     data[i][j]=m.size();
-                    nomName[j].push_back(p->str);
+                    nomName[j].append(p->str);
                     m.insert(p->str,m.size());
                 }
                 p=p->down;
             }
         }
     }
+    deb<<"Transform success！";
     return stdData;
 }
 
 void GenericData::test(){
     GenericData genData;
-    genData.loadCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train.csv",1,1);
-    //genData.colStrSplit("Name",", ");
-    //genData.colStrSplit("Ticket"," ");
-    genData.saveCsv("E:/scientific research/experiment/data/Titanic Machine Learning from Disaster/train1.csv");
+    StandardData *stdData;
+    genData.loadCsv("E:/scientific research/experiment/data/Digit Recognizer/test.csv",1);
+    stdData=genData.toStandardData();
+    stdData->saveCsv("E:/scientific research/experiment/data/Digit Recognizer/test1.csv");
+    delete stdData;
 }

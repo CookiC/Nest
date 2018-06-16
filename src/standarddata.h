@@ -2,10 +2,9 @@
 #define STANDARDDATA_H
 
 #include "header.h"
-#include "strictdata.h"
 #include "genericdata.h"
 
-class StandardData: public StrictData{
+class StandardData{
     friend class GenericData;
 
 public:
@@ -15,6 +14,9 @@ public:
     ~StandardData();
 
 private:
+    int numRow;
+    int numCol;
+    double **data;
     bool **missing;
     DataType *type;
     QStringList rowName;

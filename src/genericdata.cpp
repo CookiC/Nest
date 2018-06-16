@@ -1,5 +1,7 @@
 ﻿#include "genericdata.h"
 
+//private:
+
 class GenericData::Node{
 public:
     Node* up;
@@ -11,22 +13,8 @@ public:
     Node(QString value):up(nullptr),down(nullptr),left(nullptr),right(nullptr),str(value){}
 };
 
-GenericData::GenericData(){
-    Node* p = new Node();
-    p->up = p;
-    p->down = p;
-    p->left = p;
-    p->right = p;
-    head = p;
-    numCol = 0;
-    numRow = 0;
-}
-
-GenericData::~GenericData(){
-}
-
-void GenericData::appendRowHead(const QString& rowName){
-    Node* p = new Node(rowName);
+void GenericData::appendRowHead(const QString& str){
+    Node* p = new Node(str);
     p->left = p;
     p->right = p;
     p->up = head->up;
@@ -35,6 +23,21 @@ void GenericData::appendRowHead(const QString& rowName){
     head->up = p;
     rowHead.push_back(p);
     numRow=(int)rowHead.size();
+}
+
+void GenericData::appendColHead(const QString& name){
+    InsertColHead(numCol,name);
+}
+
+void GenericData::deleteColHead(int index){
+    Node* p = colHead[index];
+    for(int i=index;i<numCol;++i)
+        colHead[i]=colHead[i+1];
+    colHead.pop_back();
+    numCol=(int)colHead.size();
+    p->left->right = p->right;
+    p->right->left = p->left;
+    delete p;
 }
 
 void GenericData::deleteRowHead(int index){
@@ -46,30 +49,6 @@ void GenericData::deleteRowHead(int index){
     p->up->down = p->down;
     p->down->up = p->up;
     delete p;
-}
-
-void GenericData::deleteRow(int index){
-    Node *p,*q;
-    for(p=rowHead[index]->left;p!=rowHead[index];p=q){
-        q=p->left;
-        p->up->down=p->down;
-        p->down->up=p->up;
-        delete p;
-    }
-    deleteRowHead(index);
-}
-
-bool GenericData::deleteRow(const QString& name){
-    for(int i=0;i<numCol;++i)
-        if(rowHead[i]->str==name){
-            deleteRow(i);
-            return true;
-        }
-    return true;
-}
-
-void GenericData::appendColHead(const QString& name){
-    InsertColHead(numCol,name);
 }
 
 void GenericData::InsertColHead(int index, const QString &name){
@@ -94,51 +73,30 @@ void GenericData::InsertColHead(int index, const QString &name){
     numCol=(int)colHead.size();
 }
 
-void GenericData::deleteColHead(int index){
-    Node* p = colHead[index];
-    for(int i=index;i<numCol;++i)
-        colHead[i]=colHead[i+1];
-    colHead.pop_back();
-    numCol=(int)colHead.size();
-    p->left->right = p->right;
-    p->right->left = p->left;
-    delete p;
+//public:
+
+GenericData::GenericData(){
+    Node* p = new Node();
+    p->up = p;
+    p->down = p;
+    p->left = p;
+    p->right = p;
+    head = p;
+    numCol = 0;
+    numRow = 0;
 }
 
-void GenericData::deleteCol(int index){
-    Node *p,*q;
-    for(p=colHead[index]->up;p!=colHead[index];p=q){
-        q=p->up;
-        p->left->right=p->right;
-        p->right->left=p->left;
-        delete p;
-    }
-    deleteColHead(index);
+GenericData::~GenericData(){
 }
 
-int GenericData::getColIndex(const QString& name){
-    for(int i=0;i<numCol;++i)
-        if(colHead[i]->str==name)
-            return i;
-    return -1;
-}
-
-bool GenericData::deleteCol(const QString& name){
-    int i=getColIndex(name);
-    if(i<0)
-        return false;
-    deleteCol(i);
-    return true;
-}
-
-bool GenericData::appendRow(const QStringList &row, const QString& name){
+bool GenericData::appendRow(const QStringList &row){
     if(row.size()!=numCol)
         return false;
-    appendRowHead(name);
+    appendRowHead(row[0]);
     Node *q,*U,*R,*L,*D;
     Node *p=*rowHead.rbegin();
-    for(auto s:row){
-        q = new Node(s);
+    for(int i=1;i<row.size();++i){
+        q = new Node(row[i]);
         L = p->left;
         R = p;
         U = L->up->right;
@@ -155,124 +113,34 @@ bool GenericData::appendRow(const QStringList &row, const QString& name){
     return true;
 }
 
-bool GenericData::insertCol(int index, const QStringList &col, const QString &name){
-    if(col.size()!=numRow)
-        return false;
-    InsertColHead(index, name);
-    Node *q,*U,*R,*L,*D;
-    Node *p=colHead[index];
-    for(auto s:col){
-        q = new Node(s);
-        U = p->up;
-        D = p;
-        L = U->left->down;
-        R = U->right->down;
-        q->right = R;
-        q->left = L;
-        q->up = U;
-        q->down = D;
-        L->right = q;
-        R->left = q;
-        U->down = q;
-        D->up = q;
+void GenericData::colStrSplit(int index, const QRegularExpression &regExp){
+    QString name = colHead[index]->str;
+    Node *h,*p;
+    QStringList *row = new QStringList[numRow];
+    QStringList col;
+    int i,j,size=0;
+
+    h=colHead[index];
+    i=0;
+    for(p=h->down;p!=h;p=p->down){
+        row[i] = p->str.split(regExp);
+        if(row[i].size()>size)
+            size = row[i].size();
+        ++i;
     }
-    return true;
-}
+    deleteCol(index);
 
-bool GenericData::loadCsv(QString filePath, bool hasRowName, bool hasColName){
-    rowNameFlag = hasRowName;
-    colNameFlag = hasColName;
-
-    QFile fileIn(filePath);
-    QByteArray line,val;
-    fileIn.open(QIODevice::ReadOnly | QIODevice::Text);
-    int i;
-    if(fileIn.isOpen()&&colNameFlag){
-        line=fileIn.readLine();
-        val.clear();
-        for(i=0;i<line.size()-1;++i){
-            if(line[i]==','){
-                appendColHead(val);
-                val.clear();
-            }
-            else if(line[i]=='"'){
-                for(++i;line[i]!='"'&&i<line.size();++i)
-                    val.append(line[i]);
-            }
+    for(i=0;i<size;++i){
+        col.clear();
+        for(j=0;j<numRow;++j){
+            if(row[j].size()-size+i>=0)
+                col.append(row[j][row[j].size()-size+i]);
             else
-                val.append(line[i]);
+                col.append("");
+            qDebug()<<*col.rbegin()<<',';
         }
-        appendColHead(val);
+        insertCol(index+i,col,name+"#"+QString::number(i));
     }
-
-    QString rowName;
-    QStringList row;
-    while(!fileIn.atEnd()) {
-        line=fileIn.readLine();
-        val.clear();
-        row.clear();
-        if(rowNameFlag)
-            rowName="一二三";
-        else
-            rowName="";
-        for(i=0;i<line.size()-1;++i){
-            if(line[i]==','){
-                row.push_back(val);
-                val.clear();
-            }
-            else if(line[i]=='"'){
-                for(++i;line[i]!='"'&&i<line.size();++i)
-                    val.append(line[i]);
-            }
-            else
-                val.append(line[i]);
-        }
-        row.append(val);
-        appendRow(row,rowName);
-    }
-    fileIn.close();
-    cout<<"Load end!"<<endl;
-    return true;
-}
-
-void GenericData::saveCsv(QString filePath){
-    QFile file(filePath);
-    file.open(QIODevice::WriteOnly|QIODevice::Text);
-    QTextStream out(&file);
-    if(rowNameFlag)
-        out<<',';
-    if(colNameFlag){
-        out<<colHead[0]->str;
-        for(int i=1;i<numCol;++i)
-            out<<','<<colHead[i]->str;
-        out<<'\n';
-    }
-    for(auto p:rowHead){
-        if(rowNameFlag)
-            out<<p->str<<',';
-        Node* q=p->right;
-        out<<q->str;
-        for(q=q->right;q!=p;q=q->right)
-            if(q->str.contains(','))
-                out<<','<<'"'<<q->str<<'"';
-            else
-                out<<','<<q->str;
-        out<<'\n';
-    }
-}
-
-void GenericData::colStrSplit(const QString& name, const QString& delimiter, bool repeat){
-    int i=getColIndex(name);
-    if(i<0)
-        return;
-    colStrSplit(i,delimiter,repeat);
-}
-
-void GenericData::colStrSplit(const QString& name, const QRegularExpression &regExp){
-    int i=getColIndex(name);
-    if(i<0)
-        return;
-    colStrSplit(i, regExp);
 }
 
 void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
@@ -305,33 +173,160 @@ void GenericData::colStrSplit(int index, const QString& delimiter, bool repeat){
     p->str=name+'#'+QString::number(i);
 }
 
-void GenericData::colStrSplit(int index, const QRegularExpression &regExp){
-    QString name = colHead[index]->str;
-    Node *h,*p;
-    QStringList *row = new QStringList[numRow];
-    QStringList col;
-    int i,j,size=0;
 
-    h=colHead[index];
-    i=0;
-    for(p=h->down;p!=h;p=p->down){
-        row[i] = p->str.split(regExp);
-        if(row[i].size()>size)
-            size = row[i].size();
-        ++i;
+void GenericData::colStrSplit(const QString& name, const QRegularExpression &regExp){
+    int i=getColIndex(name);
+    if(i<0)
+        return;
+    colStrSplit(i, regExp);
+}
+
+void GenericData::colStrSplit(const QString& name, const QString& delimiter, bool repeat){
+    int i=getColIndex(name);
+    if(i<0)
+        return;
+    colStrSplit(i,delimiter,repeat);
+}
+
+void GenericData::deleteRow(int index){
+    Node *p,*q;
+    for(p=rowHead[index]->left;p!=rowHead[index];p=q){
+        q=p->left;
+        p->up->down=p->down;
+        p->down->up=p->up;
+        delete p;
     }
-    deleteCol(index);
+    deleteRowHead(index);
+}
 
-    for(i=0;i<size;++i){
-        col.clear();
-        for(j=0;j<numRow;++j){
-            if(row[j].size()-size+i>=0)
-                col.append(row[j][row[j].size()-size+i]);
-            else
-                col.append("");
-            qDebug()<<*col.rbegin()<<',';
+bool GenericData::deleteRow(const QString& name){
+    for(int i=0;i<numCol;++i)
+        if(rowHead[i]->str==name){
+            deleteRow(i);
+            return true;
         }
-        insertCol(index+i,col,name+"#"+QString::number(i));
+    return true;
+}
+
+void GenericData::deleteCol(int index){
+    Node *p,*q;
+    for(p=colHead[index]->up;p!=colHead[index];p=q){
+        q=p->up;
+        p->left->right=p->right;
+        p->right->left=p->left;
+        delete p;
+    }
+    deleteColHead(index);
+}
+
+bool GenericData::deleteCol(const QString& name){
+    int i=getColIndex(name);
+    if(i<0)
+        return false;
+    deleteCol(i);
+    return true;
+}
+
+int GenericData::getColIndex(const QString& name){
+    for(int i=0;i<numCol;++i)
+        if(colHead[i]->str==name)
+            return i;
+    return -1;
+}
+
+bool GenericData::insertCol(int index, const QStringList &col, const QString &name){
+    if(col.size()!=numRow)
+        return false;
+    InsertColHead(index, name);
+    Node *q,*U,*R,*L,*D;
+    Node *p=colHead[index];
+    for(auto s:col){
+        q = new Node(s);
+        U = p->up;
+        D = p;
+        L = U->left->down;
+        R = U->right->down;
+        q->right = R;
+        q->left = L;
+        q->up = U;
+        q->down = D;
+        L->right = q;
+        R->left = q;
+        U->down = q;
+        D->up = q;
+    }
+    return true;
+}
+
+bool GenericData::loadCsv(QString filePath, bool hasColName){
+    colNameFlag = hasColName;
+
+    QFile fileIn(filePath);
+    QByteArray line,val;
+    fileIn.open(QIODevice::ReadOnly | QIODevice::Text);
+    int i;
+    if(fileIn.isOpen()&&colNameFlag){
+        line=fileIn.readLine();
+        val.clear();
+        for(i=0;i<line.size()-1;++i){
+            if(line[i]==','){
+                appendColHead(val);
+                val.clear();
+            }
+            else if(line[i]=='"'){
+                for(++i;line[i]!='"'&&i<line.size();++i)
+                    val.append(line[i]);
+            }
+            else
+                val.append(line[i]);
+        }
+        appendColHead(val);
+    }
+
+    QStringList row;
+    while(!fileIn.atEnd()) {
+        line=fileIn.readLine();
+        val.clear();
+        row.clear();
+        for(i=0;i<line.size()-1;++i){
+            if(line[i]==','){
+                row.push_back(val);
+                val.clear();
+            }
+            else if(line[i]=='"'){
+                for(++i;line[i]!='"'&&i<line.size();++i)
+                    val.append(line[i]);
+            }
+            else
+                val.append(line[i]);
+        }
+        row.append(val);
+        appendRow(row);
+    }
+    fileIn.close();
+    cout<<"Load Success!"<<endl;
+    return true;
+}
+
+void GenericData::saveCsv(QString filePath){
+    QFile file(filePath);
+    file.open(QIODevice::WriteOnly|QIODevice::Text);
+    QTextStream out(&file);
+    if(colNameFlag){
+        out<<colHead[0]->str;
+        for(int i=1;i<numCol;++i)
+            out<<','<<colHead[i]->str;
+        out<<'\n';
+    }
+    for(auto p:rowHead){
+        Node* q=p;
+        out<<q->str;
+        for(q=q->right;q!=p;q=q->right)
+            if(q->str.contains(','))
+                out<<','<<'"'<<q->str<<'"';
+            else
+                out<<','<<q->str;
+        out<<'\n';
     }
 }
 

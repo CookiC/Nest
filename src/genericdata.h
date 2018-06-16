@@ -10,22 +10,20 @@ class GenericData{
 public:
     GenericData();
     ~GenericData();
-    //载入csv文件（文件路径，是否有行名，是否有列名）
-    bool loadCsv(QString, bool=0, bool=1);
-    //保存csv文件（文件名）
-    void saveCsv(QString);
-    //添加列（行数据，行名）
-    bool appendRow(const QStringList &, const QString& = "");
-    void colStrSplit(int, const QString &, bool=false);
-    void colStrSplit(int, const QRegularExpression &);
-    void colStrSplit(const QString &, const QString&, bool=false);
+
+    bool appendRow(const QStringList &);
     void colStrSplit(const QString &, const QRegularExpression &);
+    void colStrSplit(const QString &, const QString&, bool=false);
+    void colStrSplit(int, const QRegularExpression &);
+    void colStrSplit(int, const QString &, bool=false);
     void deleteRow(int);
-    void deleteCol(int);
     bool deleteRow(const QString&);
+    void deleteCol(int);
     bool deleteCol(const QString&);
-    bool insertCol(int, const QStringList&, const QString& = "");
     int getColIndex(const QString&);
+    bool insertCol(int, const QStringList&, const QString& = "");
+    bool loadCsv(QString, bool=1);
+    void saveCsv(QString);
     StandardData* toStandardData();
 
     static void test();
@@ -35,7 +33,6 @@ private:
 
     int numRow;
     int numCol;
-    bool rowNameFlag;
     bool colNameFlag;
     Node* head;
     QList<Node*> rowHead;

@@ -1,10 +1,7 @@
-#include "cpython.h"
+﻿#include "cpython.h"
 
-//确保同一时间仅有一个CPython对象
-//以此确保Py_Initialize与Py_Finalize成对执行
 bool CPython::isRunning = 0;
 
-//指向当前运行的CPython对象
 CPython* CPython::ptr = nullptr;
 
 PyObject* CPython::pLib = nullptr;

@@ -33,7 +33,6 @@ SOURCES += \
     cparray.cpp \
     genericdata.cpp \
     standarddata.cpp \
-    strictdata.cpp \
     nstring.cpp
 
 HEADERS += \
@@ -41,7 +40,6 @@ HEADERS += \
     header.h \
     cparray.h \
     genericdata.h \
-    strictdata.h \
     standarddata.h \
     nstring.h
 

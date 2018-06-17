@@ -2,6 +2,8 @@
 
 [TOC]
 
+## Our purpose
+
 ## Updates
 
 ### Ash v1.12

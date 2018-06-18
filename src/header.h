@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QList>
 #include <QMap>
+#include <QQueue>
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>

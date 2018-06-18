@@ -2,7 +2,10 @@
 
 [TOC]
 
-## Our purpose
+## Purpose
+
+1. 整合重写补全机器学习库
+2. 通过实现机器学习算法加深对机器学习的认识
 
 ## Updates
 
@@ -20,6 +23,20 @@
 
 1. 添加了StandardData::saveCsv()函数。
 2. 更新了一系列StandardData类的内联函数以供外部类访问成员变量。
+3. 为了减少GenericData的内存占用，新添DynamicTable\<T>类。
+## Base Classes
+
+### DynamicTable\<T>
+
+​	二维表，支持时间复杂度*O(N+M)*行列删除，空间复杂度为*O(N\*M)*，可以说是逼近下限了。将在完成代码构建与测试后编入GenericData类内，目前GenericData类接口依旧可以照常使用。
+
+#### public
+
+* **int getRowNum()**
+* **int getRowNum()**
+* **T& at(int i,int j)**
+
+### NString
 
 ## Data Classes
 

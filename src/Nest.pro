@@ -34,7 +34,8 @@ SOURCES += \
     genericdata.cpp \
     standarddata.cpp \
     nstring.cpp \
-    dynamictable.cpp
+    dynamictable.cpp \
+    statictable.cpp
 
 HEADERS += \
     cpython.h \
@@ -43,7 +44,8 @@ HEADERS += \
     genericdata.h \
     standarddata.h \
     nstring.h \
-    dynamictable.h
+    dynamictable.h \
+    statictable.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

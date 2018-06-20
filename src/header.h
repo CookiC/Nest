@@ -9,9 +9,11 @@
 #include <QMap>
 #include <QQueue>
 #include <QRegularExpression>
+#include <QStack>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
+#include <QVector>
 
 #define deb qDebug()
 
@@ -21,4 +23,7 @@ using std::string;
 
 using ll = long long;
 using ull = unsigned long long;
+using QStringVector = QVector<QString>;
+using QBArrayVector = QVector<QByteArray>;
+
 #endif // HEADER_H

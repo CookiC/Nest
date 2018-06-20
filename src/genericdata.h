@@ -3,53 +3,56 @@
 
 #include "header.h"
 #include "standarddata.h"
+#include "dynamictable.h"
 
 class StandardData;
 
 class GenericData{
+private:
+    bool colNameFlag;
+    bool rowNameFlag;
+    QVector<int> colNameCnt;
+    QVector<int> rowNameCnt;
+    QStringVector colName;
+    QStringVector rowName;
+    DynamicTable<QString> data;
+
+    void insertColName(int, const QString &);
+    void insertRowName(int, const QString &);
+    void deleteColName(int);
+    void deleteRowName(int);
+    QStringVector splitCsvLine(const QByteArray &, QString&);
+
 public:
     GenericData();
     ~GenericData();
 
-    bool appendRow(const QStringList &, const QString & = "");
-    void colStrSplit(const QString &, const QRegularExpression &);
-    void colStrSplit(const QString &, const QString&, bool=false);
+    bool appendCol(const QStringVector &, const QString & = "");
+    bool appendRow(const QStringVector &, const QString & = "");
     void colStrSplit(int, const QRegularExpression &);
-    void colStrSplit(int, const QString &, bool=false);
-    void deleteRow(int);
-    bool deleteRow(const QString&);
-    void deleteCol(int);
-    bool deleteCol(const QString&);
-    int getColIndex(const QString&);
-    bool insertCol(int, const QStringList&, const QString& = "");
-    bool loadCsv(QString, bool=1, bool=0);
-    void saveCsv(QString);
-    StandardData* toStandardData();
+    void colStrSplit(int, int, const QString &);
+    bool deleteCol(int);
+    bool deleteRow(int);
+    int getColIndex(const QString &);
+    bool insertCol(int, const QStringVector &, const QString & = "");
+    bool insertRow(int, const QStringVector &, const QString & = "");
 
-    static void test();
 
-private:
-    class Node;
+    inline int getColNum(){
+        return data.getColNum();
+    }
 
-    int numRow;
-    int numCol;
-    bool colNameFlag;
-    bool rowNameFlag;
-    Node* head;
-    QList<Node*> rowHead;
-    QList<Node*> colHead;
-    //对列名相同的进行计数并重命名（未决定是否开发）
-    //QMap<QString> rowNameCnt;
-    //QMap<QString> colNameCnt;
+    inline int getRowNum(){
+        return data.getRowNum();
+    }
 
-    static void deleteNode(Node*);
+    inline QString& at(int i,int j){
+        return data.at(i,j);
+    }
 
-    void appendColHead(const QString& = "");
-    void appendRowHead(const QString& = "");
-    void deleteColHead(int);
-    void deleteRowHead(int);
-    void InsertColHead(int, const QString& = "");
-
+    inline const QString& at(int i,int j) const{
+        return data.at(i,j);
+    }
 };
 
 #endif // GENERICDATA_H

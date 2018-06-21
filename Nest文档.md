@@ -26,6 +26,8 @@
 3. 为了减少GenericData的内存占用，新添DynamicTable\<T>类。
 ## Base Classes
 
+基础算法结构
+
 ### DynamicTable\<T>
 
 ​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。将在完成代码构建与测试后编入GenericData类内，目前GenericData类接口依旧可以照常使用。
@@ -39,6 +41,8 @@
 ### NString
 
 ## Data Classes
+
+数据存储类型
 
 ### GenericData
 
@@ -180,5 +184,26 @@
 
   *inline*函数为内联函数，管理成员变量并提升速度，需定义在头文件中。
 
+## Classifier Classes
 
+分类器
+
+###  AbstractClassifier
+
+#### public
+
+* **virtual fit() = 0**
+
+  拟合数据。
+
+* **virtual predictHard() = 0**
+  输出预测类，为所属标签或相应01向量。
+
+* **virtual predictSoft() = 0**
+
+  输出预测各类概率。
+
+* **virtual predict() = 0**
+
+  输出预测类与各类概率。
 

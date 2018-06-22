@@ -33,9 +33,7 @@ SOURCES += \
     cparray.cpp \
     genericdata.cpp \
     standarddata.cpp \
-    nstring.cpp \
-    dynamictable.cpp \
-    statictable.cpp
+    nstring.cpp
 
 HEADERS += \
     cpython.h \
@@ -44,8 +42,8 @@ HEADERS += \
     genericdata.h \
     standarddata.h \
     nstring.h \
-    dynamictable.h \
-    statictable.h
+    abstractdata.h \
+    ntable.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

@@ -2,69 +2,66 @@
 #define STANDARDDATA_H
 
 #include "header.h"
-#include "genericdata.h"
+#include "abstractdata.h"
 
-class StandardData{
-    friend class GenericData;
-public:
-    //数据类型分为连续型和离散型
-    enum DataType{NUM,NOM};
-
+class StandardData : public AbstractData<double>{
 private:
-    int numRow;
-    int numCol;
-    double **data;
-    bool isMissing;
     bool **missing;
-    DataType *type;
-    QStringList colName;
-    QStringList rowName;
-    QStringList *nomName;
+    bool *numerical;
+    QStringVector *nomName;
+
+protected:
+    virtual bool loadRow(int i, const QStringVector &row);
+    virtual void saveRow(int i, QStringVector& row);
 
 public:
-    StandardData(int, int, bool=1);
+    StandardData();
     ~StandardData();
+    void setMissing(int, int);
 
-    void saveCsv(const QString&);
-
-    inline void setMissing(int i,int j, bool b){
-        missing[i][j]=b;
-    }
-
-    inline double** getData(){
-        return data;
-    }
-
-    inline bool getIsMissing(){
-        return  isMissing;
-    }
-
-    inline int getNumRow(){
-        return numRow;
-    }
-
-    inline int getNumCol(){
-        return numCol;
-    }
-
-    inline bool getMissing(int i,int j){
-        return isMissing?missing[i][j]:false;
-    }
-
-    inline DataType getType(int i){
-        return type[i];
-    }
-
-    inline double*& operator[](const int i){
-        return data[i];
-    }
-
-    inline const double* operator[](const int i)const {
-        return data[i];
-    }
-
-private:
+    //inline
+    void addNomName(int i, const QString &name);
+    bool getMissing(int i,int j);
+    bool getNumerical(int i);
+    bool isNominal(int i);
+    bool isMissing();
+    bool isNumerical(int i);
+    void setNumerical(int i);
+    void setNominal(int i);
 
 };
+
+//public
+inline void StandardData::addNomName(int i, const QString &name){
+    nomName[i].append(name);
+}
+
+inline bool StandardData::getMissing(int i,int j){
+    return missing?missing[i][j]:false;
+}
+
+inline bool StandardData::getNumerical(int i){
+    return numerical[i];
+}
+
+inline bool StandardData::isNominal(int i){
+    return !numerical[i];
+}
+
+inline bool StandardData::isMissing(){
+    return  missing;
+}
+
+inline bool StandardData::isNumerical(int i){
+    return numerical[i];
+}
+
+inline void StandardData::setNumerical(int i){
+    numerical[i]=1;
+}
+
+inline void StandardData::setNominal(int i){
+    numerical[i]=0;
+}
 
 #endif // STANDARDDATA_H

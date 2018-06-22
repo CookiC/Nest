@@ -24,6 +24,10 @@
 1. 添加了StandardData::saveCsv()函数。
 2. 更新了一系列StandardData类的内联函数以供外部类访问成员变量。
 3. 为了减少GenericData的内存占用，新添DynamicTable\<T>类。
+## Attention
+
+1. 在C++中内联函数和模板类的定义都必须放在头文件中，否则编译失败，声明请与定义分开。
+
 ## Base Classes
 
 基础算法结构

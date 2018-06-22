@@ -2,7 +2,10 @@
 #define HEADER_H
 
 #include <iostream>
+#include <cstring>
+
 #include <QByteArray>
+#include <QDataStream>
 #include <QDebug>
 #include <QFile>
 #include <QList>
@@ -13,6 +16,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
+#include <QThread>
 #include <QVector>
 
 #define deb qDebug()

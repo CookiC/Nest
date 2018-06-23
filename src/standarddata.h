@@ -29,6 +29,7 @@ public:
     void setNumerical(int i);
     void setNominal(int i);
 
+    static void test();
 };
 
 //public

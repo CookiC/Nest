@@ -111,26 +111,35 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     if(!file.isOpen())
         return false;
+
+    int i;
     QByteArray line;
     QString name;
     QStringVector row;
     colNameFlag = hasColName;
     rowNameFlag = hasRowName;
+
     if(colNameFlag){
         line = file.readLine();
         row = splitCsvLine(line,name);
-        for(int i=0;i<rowNum;++i)
+        for(i=0;i<row.size();++i)
             colName.append(row[i]);
     }
+
     deb<<"Colhead load Success!";
-    for(int i=0;!file.atEnd();++i) {
+    for(i=0;!file.atEnd();++i) {
         line = file.readLine();
         row = splitCsvLine(line,name);
         if(rowNameFlag)
             appendRowName(name);
-        if(!loadRow(i,row))
+        if(!loadRow(i,row)){
+            deb<<i;
+            deb<<row;
+            deb<<"Load fail!";
             return false;
+        }
     }
+    deb<<"Load Success!";
     file.close();
     return true;
 }
@@ -139,25 +148,30 @@ template <typename T>
 void AbstractData<T>::saveCsv(const QString &filePath){
     QFile file(filePath);
     file.open(QIODevice::WriteOnly|QIODevice::Text);
-    if(!file.isOpen())
+    if(!file.isOpen()){
+        deb<<"Open fail!";
         return;
+    }
+    int i,j;
     QTextStream out(&file);
     if(colNameFlag){
         if(rowNameFlag)
             out<<',';
         out<<colName[0];
-        n = colName.size();
-        for(i=1;i<n;++i)
+        for(i=1;i<colNum;++i)
             out<<','<<colName[i];
         out<<'\n';
     }
 
     QStringVector row;
-    for(int i=0;i<rowNum;++i){
+    for(i=0;i<rowNum;++i){
         if(rowNameFlag)
             out<<rowName[i]<<',';
         saveRow(i,row);
-        out<<row;
+        j=0;
+        out<<row[0];
+        for(j=1;j<colNum;++j)
+            out<<','<<row[j];
         out<<'\n';
     }
     file.close();

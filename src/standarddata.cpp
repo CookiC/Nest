@@ -2,7 +2,8 @@
 
 //public
 
-StandardData::StandardData():missing(nullptr){
+StandardData::StandardData():
+    missing(nullptr),numerical(nullptr),nomName(nullptr){
 }
 
 StandardData::~StandardData(){
@@ -33,13 +34,22 @@ bool StandardData::loadRow(int i, const QStringVector &row){
     QVector<double> r;
     for(QString s:row){
         r.append(s.toDouble(&ok));
-        if(!ok)
+        if(!ok){
+            deb<<"Has string!";
             return false;
+        }
     }
     return NTable::insertRow(i,r);
 }
 
 void StandardData::saveRow(int i, QStringVector& row){
     row.clear();
-    for(int j=0;j<colNum;++j);
+    for(int j=0;j<colNum;++j)
+        row.append(QString::number(get(i,j)));
+}
+
+void StandardData::test(){
+    StandardData stdData;
+    stdData.loadCsv("E:/scientific research/experiment/data/Digit Recognizer/train.csv",1,0);
+    stdData.saveCsv("E:/scientific research/experiment/data/Digit Recognizer/train1.csv");
 }

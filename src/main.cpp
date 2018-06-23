@@ -1,7 +1,9 @@
 ﻿#include "cpython.h"
 #include "genericdata.h"
+#include "standarddata.h"
 
 int main(int argc, char *argv[]){
-    GenericData::test();
+    deb<<"Programm start!";
+    StandardData::test();
     return 0;
 }

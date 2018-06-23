@@ -68,12 +68,11 @@ bool GenericData::loadRow(int i, const QStringVector &row){
 
 void GenericData::saveRow(int i, QStringVector& row){
     row.clear();
-    row.append(get(i,0));
-    for(int j=1;j<colNum;++j)
+    for(int j=0;j<colNum;++j)
         if(get(i,j).contains(','))
-            row.append(",\""+get(i,j)+"\"");
+            row.append("\""+get(i,j)+"\"");
         else
-            row.append(","+get(i,j));
+            row.append(get(i,j));
 }
 
 /*

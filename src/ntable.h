@@ -24,7 +24,6 @@ public:
     void deleteRow(int i);
     bool insertCol(int i, const QVector<T>& col);
     bool insertRow(int i, const QVector<T>& row);
-    void print();
 
     //inline
     bool appendCol(const QVector<T>& col);
@@ -108,20 +107,6 @@ bool NTable<T>::insertRow(int index, const QVector<T>& row){
     ++rowNum;
     return true;
 }
-
-template<typename T>
-void NTable<T>::print(){
-    int i,j;
-    for(i=0;i<rowNum;++i){
-        for(j=0;j<colNum;++j){
-            if(j)
-                deb<<',';
-            deb<<get(i,j);
-        }
-        deb<<'\n';
-    }
-}
-
 
 template<typename T>
 inline bool NTable<T>::appendCol(const QVector<T>& col){

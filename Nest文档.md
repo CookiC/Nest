@@ -9,40 +9,66 @@
 
 ## Updates
 
-### Ash v1.12
-
-1. 取消了StrictData类。
-
-2. 重写了Standard类的构造和析构函数。
-
-3. 完善了Nest文档。
-
-4. 测试了GenericData::load_csv与GenericData::save_csv函数，应该没有问题了。
-
 ### Ash v1.13
 
 1. 添加了StandardData::saveCsv()函数。
 2. 更新了一系列StandardData类的内联函数以供外部类访问成员变量。
 3. 为了减少GenericData的内存占用，新添DynamicTable\<T>类。
+### Ash v1.14
+
+1. 实现了NTable模板类
+
 ## Attention
 
 1. 在C++中内联函数和模板类的定义都必须放在头文件中，否则编译失败，声明请与定义分开。
 
 ## Base Classes
 
-基础算法结构
+### NTable\<T>
 
-### DynamicTable\<T>
-
-​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。将在完成代码构建与测试后编入GenericData类内，目前GenericData类接口依旧可以照常使用。
+​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。采用了内存回收机制，删除的列或行并不会直接将内存返还给系统，而是在析构时才将内存返还，以达到在删除后再次插入无需再向系统申请内存。
 
 #### public
 
+* **void deleteCol(int i)**
+
+* **void deleteRow(int i)**
+
+* **bool insertCol(int i, const QVector\<T>& col)**
+
+* **bool insertRow(int i, const QVector\<T>& row)**
+
+* **bool appendCol(const QVector\<T>& col)**
+
+  在尾部添加列。
+
+* **bool appendRow(const QVector\<T>& row)**
+
+  在尾部添加行。
+
+* **T& at(int i,int j);**
+
+  返回对应索引的引用。
+
+* **const T& get(int i,int j) const;**
+
+  返回对应索引的常量值，建议日常使用该函数，与at区分开来。
+
+* **int getColNum();**
+
+* **int getRowNum();**
+
+* **void set(int i,int j,const T& value);**
+
+  设置对应索引值。
+
+* **int getColNum()**
+
 * **int getRowNum()**
-* **int getRowNum()**
-* **T& at(int i,int j)**
 
 ### NString
+
+在遥远的计划中的类，用以替代内存消耗巨大的QString类以及使用不怎么方便的std:tring类。
 
 ## Data Classes
 

@@ -40,7 +40,7 @@ public:
     int getColIndex(const QString& name);
     bool insertCol(int index, const QVector<T>& col, const QString& name);
     bool insertRow(int index, const QVector<T>& row, const QString& name);
-    bool loadCsv(const QString &, bool = 1, bool = 0);
+    bool loadCsv(const QString &path, bool hasColName, bool hasRowName);
     void saveCsv(const QString &);
 };
 

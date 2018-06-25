@@ -26,7 +26,7 @@
 
 ### NTable\<T>
 
-​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。采用了内存回收机制，删除的列或行并不会直接将内存返还给系统，而是在析构时才将内存返还，以达到在删除后再次插入无需再向系统申请内存。
+​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。采用了内存回收机制，删除的列或行并不会直接将内存返还给系统，而是在析构时才将内存返还，以达到在删除后再次插入无需再向系统申请内存。可进一步优化内存。
 
 #### public
 
@@ -72,53 +72,51 @@
 
 ## Data Classes
 
-数据存储类型
+### AbstractData\<T> : NTable\<T>
 
-### GenericData
+数据类的虚基类，主要负责处理列名，头名。
 
-使用十字循环链表作为基础数据存储结构，插入行列的复杂度为O(N+M)，N为行数，M为列数，每个节点存储的是字符串，将支持csv、arff的读入与保存。需开发arff文件读入。
+#### public
+* **AbstractData()**
 
-#### private
+* **bool appendCol(const QVector\<T>& col, const QString& name)**
 
+* **bool appendRow(const QVector\<T>& col, const QString& name)**
+
+* **void deleteCol(int index)**
+
+* **void deleteRow(int index)**
+
+* **int getColIndex(const QString& name)**
+
+* **bool insertCol(int index, const QVector\<T>& col, const QString& name)**
+
+* **bool insertRow(int index, const QVector\<T>& row, const QString& name)**
+
+* **bool loadCsv(const QString &path, bool hasColName, bool hasRowName)**
+  载入csv文件（文件名及路径，是否有列名，是否有行名）
+
+* **void saveCsv(const QString &)**
+
+  保存csv文件（文件名及路径）
+
+#### protected
 * **bool colNameFlag**
-
-  是否有列名的标志
-
 * **bool rowNameFlag**
+* **void deleteColName(int index)**
+* **void deleteRowName(int index)**
+* **void insertColName(int index, const QString& name)**
+* **void insertRowName(int index, const QString& name)**
+* **QStringVector splitCsvLine(const QByteArray &line, QString& name)**
+* **void appendColName(const QString& name)**
+* **void appendRowName(const QString& name)**
+* **const QString& getColName(int i)**
+* **const QString& getRowName(int i)**
+* **virtual bool loadRow(int i, const QStringVector &row) = 0**
+* **virtual void saveRow(int i, QStringVector& row) = 0**
+### GenericData : AbstractData\<QString>
 
-  是否有行名的标志
-
-* **Node \*head**
-
-  *rowHead*与*colHead*的头指针,可存储行名的名字。
-
-* **QList<Node\*> colHead**
-
-  列头数组，指向列头节点，colHead[0]->str为列名，colHead[0]->down->str为第0行第0个字符串元素。
-  
-* **QList<Node\*> rowHead**
-
-  行头数组，指向行头节点，rowHead[0]->str为行名，rowHead[0]->right->str为第0行第0个字符串元素。
-
-* **void appendColHead(const QString &colName = "")**
-
-  向列头数组尾部添加列头（列名）
-
-* **void appendRowHead(const QString &colName = "")**
-
-  向行头数组尾部添加行头（行名）
-
-* **void deleteColHead(int index)**
-
-  删除列头，并释放内存
-
-* **void deleteRowHead(int index)**
-
-  删除行头，并释放内存
-
-* **void InsertColHead(int index, const QString &name = "")**
-
-  在*index*位置插入列头
+将支持csv、arff的读入与保存。需开发arff文件读入。
 
 #### public
 
@@ -142,14 +140,6 @@
 
   列字符串分割，根据列名查询所需分割列索引。
 
-* **void deleteRow(int index)**
-
-* **bool deleteRow(const QString& name)**
-
-* **void deleteCol(int index)**
-
-* **bool deleteCol(const QString& name)**
-
 * **int getColIndex(const QString& name)**
 
   根据列名查找索引，*O(numCol)* 复杂度。
@@ -158,20 +148,12 @@
 
   插入列（列索引，列数据，列名）。
 
-* **bool loadCsv(QString filePath, bool hasColName， bool hasRowName)**
-
-  载入csv文件（文件名及路径，是否有列名）
-
-* **void saveCsv(QString)**
-
-  保存csv文件（文件名及路径）
-
 * **StandardData* toStandardData()**
 
   将字符串转化为数字，能成功转化的判定为连续值，失败的判定为离散值，添加索引并记录；统计是否有缺失值，字符串为空即判定为缺失。
 
 
-### StandardData
+### StandardData : AbstractData\<double>
 
 ​	使用double二维数组存储数据，所以插入和删除行列的速度会很慢，就干脆不支持行列插入删除了，可支持csv、arff文件的读入保存（可选择性开发，因为已经有通用数据能读写了）。支持缺失值和离散值，离散值都用数字索引表示，索引对应的离散值名都存储在nomName中。需开发处理缺失值离散值的函数以及转化函数。需要开发数据归一化函数，详情请见Min-max normalization，z-score方法。
 #### private

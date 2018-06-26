@@ -89,6 +89,8 @@
 
 * **int getColIndex(const QString& name)**
 
+  返回与*name*相等列名的最小的索引，如不存在返回-1。
+
 * **bool insertCol(int index, const QVector\<T>& col, const QString& name)**
 
 * **bool insertRow(int index, const QVector\<T>& row, const QString& name)**
@@ -102,17 +104,31 @@
 
 #### protected
 * **bool colNameFlag**
+
 * **bool rowNameFlag**
+
 * **void deleteColName(int index)**
+
 * **void deleteRowName(int index)**
+
 * **void insertColName(int index, const QString& name)**
+
 * **void insertRowName(int index, const QString& name)**
+
 * **QStringVector splitCsvLine(const QByteArray &line, QString& name)**
+
+  分割csv文件的一行，返回值已移除‘，’分隔符。
+
 * **void appendColName(const QString& name)**
+
 * **void appendRowName(const QString& name)**
+
 * **const QString& getColName(int i)**
+
 * **const QString& getRowName(int i)**
+
 * **virtual bool loadRow(int i, const QStringVector &row) = 0**
+
 * **virtual void saveRow(int i, QStringVector& row) = 0**
 ### GenericData : AbstractData\<QString>
 
@@ -204,18 +220,22 @@
 
 #### public
 
-* **virtual fit() = 0**
+* **virtual void fit(StandardData *data) = 0**
 
   拟合数据。
 
-* **virtual predictHard() = 0**
+* **virtual NTable\<int> predictHard(StandardData *data) = 0**
   输出预测类，为所属标签或相应01向量。
 
-* **virtual predictSoft() = 0**
+* **virtual NTable\<double> predictSoft(StandardData *data) = 0**
 
   输出预测各类概率。
 
-* **virtual predict() = 0**
+* **virtual void predict(StandardData *data, NTable\<int> *hard, NTable\<double> *soft) = 0**
 
   输出预测类与各类概率。
+
+### CARTClassifier
+
+*CART*决策树分类器
 

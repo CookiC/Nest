@@ -11,6 +11,7 @@ private:
     QVector<int> rowNameCnt;
     QStringVector colName;
     QStringVector rowName;
+    int y;
 
 protected:
     bool colNameFlag;
@@ -42,11 +43,16 @@ public:
     bool insertRow(int index, const QVector<T>& row, const QString& name);
     bool loadCsv(const QString &path, bool hasColName, bool hasRowName);
     void saveCsv(const QString &);
+
+    //inline
+    void setY(int i);
+    int getY();
 };
 
 //public
 template <typename T>
 AbstractData<T>::AbstractData(){
+    y=0;
 }
 
 template <typename T>
@@ -175,6 +181,18 @@ void AbstractData<T>::saveCsv(const QString &filePath){
         out<<'\n';
     }
     file.close();
+}
+
+//public inline
+
+template <typename T>
+void AbstractData<T>::setY(int i){
+    y = i;
+}
+
+template <typename T>
+int AbstractData<T>::getY(){
+    return y;
 }
 
 //protect

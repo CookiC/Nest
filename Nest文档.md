@@ -102,6 +102,14 @@
 
   保存csv文件（文件名及路径）
 
+* **void setY(int i)**
+
+  设置目标属性。
+
+* **int getY()**
+
+  返回目标属性。
+
 #### protected
 * **bool colNameFlag**
 

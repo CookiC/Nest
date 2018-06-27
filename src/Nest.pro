@@ -33,7 +33,9 @@ SOURCES += \
     cparray.cpp \
     genericdata.cpp \
     standarddata.cpp \
-    nstring.cpp
+    nstring.cpp \
+    abstractclassifier.cpp \
+    cartclassifier.cpp
 
 HEADERS += \
     cpython.h \
@@ -43,7 +45,9 @@ HEADERS += \
     standarddata.h \
     nstring.h \
     abstractdata.h \
-    ntable.h
+    ntable.h \
+    abstractclassifier.h \
+    cartclassifier.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

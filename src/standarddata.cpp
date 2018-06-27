@@ -3,7 +3,7 @@
 //public
 
 StandardData::StandardData():
-    missing(nullptr),numerical(nullptr),nomName(nullptr){
+    missing(nullptr),attrCategory(nullptr),nomName(nullptr){
 }
 
 StandardData::~StandardData(){
@@ -12,8 +12,8 @@ StandardData::~StandardData(){
             delete[] missing[i];
         delete[] missing;
     }
-    if(numerical)
-        delete[] numerical;
+    if(attrCategory)
+        delete[] attrCategory;
     if(nomName)
         delete[] nomName;
 }

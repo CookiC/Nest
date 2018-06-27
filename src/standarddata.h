@@ -7,7 +7,7 @@
 class StandardData : public AbstractData<double>{
 private:
     bool **missing;
-    bool *numerical;
+    char *attrCategory;
     QStringVector *nomName;
 
 protected:
@@ -21,6 +21,7 @@ public:
 
     //inline
     void addNomName(int i, const QString &name);
+    const char* getAttrCategory();
     bool getMissing(int i,int j);
     bool getNumerical(int i);
     bool isNominal(int i);
@@ -28,7 +29,6 @@ public:
     bool isNumerical(int i);
     void setNumerical(int i);
     void setNominal(int i);
-
     static void test();
 };
 
@@ -41,12 +41,12 @@ inline bool StandardData::getMissing(int i,int j){
     return missing?missing[i][j]:false;
 }
 
-inline bool StandardData::getNumerical(int i){
-    return numerical[i];
+inline const char * StandardData::getAttrCategory(){
+    return attrCategory;
 }
 
 inline bool StandardData::isNominal(int i){
-    return !numerical[i];
+    return !attrCategory[i];
 }
 
 inline bool StandardData::isMissing(){
@@ -54,15 +54,15 @@ inline bool StandardData::isMissing(){
 }
 
 inline bool StandardData::isNumerical(int i){
-    return numerical[i];
+    return attrCategory[i];
 }
 
 inline void StandardData::setNumerical(int i){
-    numerical[i]=1;
+    attrCategory[i]=1;
 }
 
 inline void StandardData::setNominal(int i){
-    numerical[i]=0;
+    attrCategory[i]=0;
 }
 
 #endif // STANDARDDATA_H

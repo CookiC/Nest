@@ -6,7 +6,7 @@ class CARTClassifier::Node{
     int attrIndex;
     double splite;
 
-    Node(int left, int right, int attrIndex, double splite):
+    Node(int left, int right, int attrIndex = 0, double splite = 0):
         left(left),right(right),attrIndex(attrIndex),splite(splite){}
 
     int nextNom(double *inst){
@@ -49,6 +49,7 @@ void CARTClassifier::treeGenerate(int o, const QVector<int> instSet, const QVect
             if(train->get(instSet[i],attrSet[j])!=train->get(instSet[i+1],attrSet[j]))
                 same = false;
     }
-//    if(same)
-//        pool.append(Node());
+    if(same)
+        pool.append(Node(-1,-1));
+
 }

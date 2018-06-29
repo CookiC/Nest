@@ -15,9 +15,13 @@ protected:
     void fit();
 
 private:
+    int attr;
     class Node;
-    QVector<int> pool;
-    void treeGenerate(int o, const QVector<int> instSet, const QVector<int> attrSet);
+    QVector<Node> pool;
+
+    bool cmp(const int &x,const int &y);
+    double gini(const QMap<double,int> &cate, int num);
+    int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate);
 };
 
 #endif // CARTCLASSIFIER_H

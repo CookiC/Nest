@@ -1,3 +1,4 @@
+﻿#ifdef RELEASE
 #ifndef CPARRAY_H
 #define CPARRAY_H
 
@@ -15,3 +16,4 @@ public:
 
 
 #endif // CPARRAY_H
+#endif

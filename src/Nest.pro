@@ -9,7 +9,8 @@ QT      +=  core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG  +=  c++11 console
 CONFIG  -=  debug_and_release_target \
-            debug_and_release
+            debug_and_release \
+            release
 
 TARGET = Nest
 
@@ -68,12 +69,14 @@ OBJECTS_DIR = ./tmp
 #Specifies where to copy the target dll.
 DLLDESTDIR =
 
-PYTHONPATH = 'D:/Programming/Python 3.6'
-NUMPYPATH = '$$PYTHONPATH/Lib/site-packages/numpy/core'
-INCLUDEPATH +=  '$$PYTHONPATH/include' \
-                '$$NUMPYPATH/include/numpy'
-
-win32:LIBS +=   -L'./lib/' -lpython36 -lnpymath
+CONFIG(release){
+    PYTHONPATH = 'D:/Programming/Python 3.6'
+    NUMPYPATH = '$$PYTHONPATH/Lib/site-packages/numpy/core'
+    INCLUDEPATH +=  '$$PYTHONPATH/include' \
+                    '$$NUMPYPATH/include/numpy'
+    win32:LIBS +=   -L'./lib/' -lpython36 -lnpymath
+    DEFINES += RELEASE
+}
 
 #message($$LIBS)
 #message($$INCLUDEPATH)
@@ -86,3 +89,4 @@ win32:LIBS +=   -L'./lib/' -lpython36 -lnpymath
 #message($$QT)
 #message($$SOURCES)
 #message($$TEMPLATE)
+

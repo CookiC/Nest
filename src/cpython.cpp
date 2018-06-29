@@ -1,4 +1,5 @@
-﻿#include "cpython.h"
+﻿#ifdef RELEASE
+#include "cpython.h"
 
 bool CPython::isRunning = 0;
 
@@ -277,3 +278,5 @@ void CPython::test(){
         cout<<((int*)out.data)[i]<<' ';
     close();
 }
+
+#endif

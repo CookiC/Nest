@@ -47,6 +47,7 @@ public:
     //inline
     void setY(int i);
     int getY();
+    int getY(int i);
 };
 
 //public
@@ -193,6 +194,11 @@ void AbstractData<T>::setY(int i){
 template <typename T>
 int AbstractData<T>::getY(){
     return y;
+}
+
+template <typename T>
+int AbstractData<T>::getY(int i){
+    return get(i,y);
 }
 
 //protect

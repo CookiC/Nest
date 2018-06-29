@@ -1,6 +1,7 @@
 ﻿#ifndef HEADER_H
 #define HEADER_H
 
+#include <QtAlgorithms>
 #include <iostream>
 #include <cstring>
 
@@ -12,6 +13,7 @@
 #include <QMap>
 #include <QQueue>
 #include <QRegularExpression>
+#include <QSet>
 #include <QStack>
 #include <QString>
 #include <QStringList>

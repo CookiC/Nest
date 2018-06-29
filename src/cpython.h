@@ -1,3 +1,4 @@
+﻿#ifdef RELEASE
 #ifndef CPYTHON_H
 #define CPYTHON_H
 
@@ -34,3 +35,4 @@ private:
 };
 
 #endif // CPYTHON_H
+#endif

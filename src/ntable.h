@@ -36,7 +36,7 @@ public:
 };
 
 template<typename T>
-NTable<T>::NTable(){
+NTable<T>::NTable():colNum(0),rowNum(0){
 }
 
 template<typename T>

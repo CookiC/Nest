@@ -93,16 +93,14 @@ int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &
     QList<int> rMaxInst;
     QMap<double, int> lCate;
     QMap<double, int> rCate;
-    bool (CARTClassifier::*f)(const int &, const int &);
-    f = &CARTClassifier::cmp;
     for(auto J:pAttr){
         attr = J;
-        //qSort(lInst.begin(),lInst.end(),f);
-        for(auto e:lInst)
-            if(lCate.contains(e))
-                ++lCate[e];
+        quickSort(lInst.begin(),lInst.end());
+        for(auto I:lInst)
+            if(lCate.contains(train->getY(I)))
+                ++lCate[train->getY(I)];
             else
-                lCate[e]=1;
+                lCate[train->getY(I)]=1;
 
         tmp = train->getY(lInst[0]);
         do{
@@ -138,4 +136,23 @@ double CARTClassifier::gini(const QMap<double,int> &cate, int num){
     for(auto e:cate)
         res -= e/n;
     return res;
+}
+
+void CARTClassifier::quickSort(QList<int>::iterator b, QList<int>::iterator e){
+    if(b==e)
+        return;
+    auto m = *b;
+    auto l = b;
+    auto r = e;
+    --r;
+    while(l!=r){
+        while(l!=r&&cmp(m,*r))	--r;
+        *l = *r;
+        while(l!=r&&cmp(*l,m))	++l;
+        *r = *l;
+    }
+    *l = m;
+    ++r;
+    quickSort(b,l);
+    quickSort(r,e);
 }

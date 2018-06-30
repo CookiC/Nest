@@ -21,7 +21,8 @@ private:
 
     bool cmp(const int &x,const int &y);
     double gini(const QMap<double,int> &cate, int num);
-    int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate);
+    int treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate);
+    void quickSort(QList<int>::iterator b, QList<int>::iterator e);
 };
 
 #endif // CARTCLASSIFIER_H

@@ -6,6 +6,8 @@
 
 class NImage
 {
+private:
+    static void delete_data(void*);
 public:
     enum Fit {
         Fit_Center, Fit_Fill, Fit_Fit, Fit_Stretch, Fit_Tile
@@ -15,30 +17,32 @@ public:
     static QVector<double>& qImageToStandardRow(QImage& image, int width = 0, int height = 0,
                                                 Fit fit = Fit_Stretch, QColor color = qRgb(0, 0, 0));
     static QVector<double>& loadStandardRow(QString path, int width = 0, int height = 0,
+                                            QImage::Format format = QImage::Format_Grayscale8,
                                             Fit fit = Fit_Stretch, QColor color = qRgb(0, 0, 0));
     static QImage& standardRowToQImage(StandardData& stdData, int index, int width, int height,
                                        QImage::Format format = QImage::Format_Grayscale8);
-    static QImage& saveStandardRow(StandardData& stdData, QString path,
+    static void saveStandardRow(StandardData& stdData, QString path,
                                    int index, int width, int height,
                                    QImage::Format format = QImage::Format_Grayscale8);
     static QImage& standardRowToQImage(QVector<double>& row, int width, int height,
                                    QImage::Format format = QImage::Format_Grayscale8);
-    static QImage& saveStandardRow(QVector<double>& row, QString path,
-                                   int index, int width, int height,
+    static void saveStandardRow(QVector<double>& row, QString path, int width, int height,
                                    QImage::Format format = QImage::Format_Grayscale8);
-    static StandardData& qImageToStandardData(QImage& image, int width = 0,int height = 0,
+    static StandardData& qImageToStandardData(QVector<QImage>& image, int width = 0,int height = 0,
                                               Fit fit = Fit_Stretch, QColor color = qRgb(0, 0, 0));
-    static StandardData& loadStandardData(QVector<QString>& paths, int width = 0,int height = 0,
+    static StandardData& loadStandardData(QStringList& paths, int width = 0,int height = 0,
+                                          QImage::Format format = QImage::Format_Grayscale8,
                                           Fit fit = Fit_Stretch, QColor color = qRgb(0, 0, 0));
-    static StandardData& loadStandardData(QString& folderPath, int width = 0,int height = 0,
+    static StandardData& loadStandardData(QString folderPath, int width = 0,int height = 0,
+                                          QImage::Format format = QImage::Format_Grayscale8,
                                           Fit fit = Fit_Stretch, QColor color = qRgb(0, 0, 0));
     static QVector<QImage>& standardDataToQImage(StandardData& stdData,
                                                  int width, int height, int start = 0, int end = 0,
                                                  QImage::Format format = QImage::Format_Grayscale8);
     static void saveStandardData(StandardData& stdData, QVector<QString>& paths,
-                                 int width, int height, int start, int end,
+                                 int width, int height, int start = 0, int end = 0,
                                  QImage::Format format = QImage::Format_Grayscale8);
-    static void saveStandardData(StandardData& stdData, QString folderPath, QString name,
+    static void saveStandardData(StandardData& stdData, QString name,
                                  int width, int height, int start = 0, int end = 0,
                                  QImage::Format format = QImage::Format_Grayscale8);
 

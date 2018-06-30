@@ -21,6 +21,7 @@
 #include <QThread>
 #include <QVector>
 #include <QImage>
+#include <QDir>
 
 #define deb qDebug()
 

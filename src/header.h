@@ -20,6 +20,7 @@
 #include <QTextStream>
 #include <QThread>
 #include <QVector>
+#include <QImage>
 
 #define deb qDebug()
 

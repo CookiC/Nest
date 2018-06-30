@@ -12,7 +12,6 @@ private:
     QVector<int> rowIndex;
     QVector<QVector<T>> data;
 
-
 protected:
     int colNum;
     int rowNum;
@@ -24,6 +23,8 @@ public:
     void deleteRow(int i);
     bool insertCol(int i, const QVector<T>& col);
     bool insertRow(int i, const QVector<T>& row);
+    QVector<T>& getCol(int i);
+    QVector<T>& getRow(int i);
 
     //inline
     bool appendCol(const QVector<T>& col);
@@ -106,6 +107,24 @@ bool NTable<T>::insertRow(int index, const QVector<T>& row){
     }
     ++rowNum;
     return true;
+}
+
+template<typename T> QVector<T> &NTable<T>::getCol(int i) {
+    int j;
+    QVector<T>* col = new QVector<T>();
+    for(j = 0; j < rowNum; j++) {
+        col -> append(data[rowIndex[j]][colIndex[i]]);
+    }
+    return *col;
+}
+
+template<typename T> QVector<T> &NTable<T>::getRow(int i) {
+    int j;
+    QVector<T>* row = new QVector<T>();
+    for(j = 0; j < colNum; j++) {
+        row -> append(data[rowIndex[i]][colIndex[j]]);
+    }
+    return *row;
 }
 
 template<typename T>

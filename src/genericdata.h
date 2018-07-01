@@ -8,8 +8,8 @@
 
 class GenericData : public AbstractData<QString>{
 protected:
-    virtual bool loadRow(int i, const QStringVector &row);
-    virtual void saveRow(int i, QStringVector& row);
+    bool loadRow(int i, const QStringVector &row);
+    void saveRow(int i, QStringVector& row);
 
 public:
     GenericData();

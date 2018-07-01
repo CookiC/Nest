@@ -8,9 +8,11 @@ QT      +=  core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG  +=  c++11 console
-CONFIG  -=  debug_and_release_target \
-            debug_and_release \
-            release
+#CONFIG  -=  debug_and_release_target \
+#            debug_and_release \
+#            release
+
+CONFIG  -= release
 
 TARGET = Nest
 

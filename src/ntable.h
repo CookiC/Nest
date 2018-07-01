@@ -56,8 +56,8 @@ NTable<T>::NTable(int rowMax, int colMax):colNum(0),rowNum(0),colMax(colMax),row
 template<typename T>
 NTable<T>::~NTable(){
     int i;
-    for(i=0;i<rowNum;++i)
-        delete[] data;
+    for(i=0;i<rowMax;++i)
+        delete[] data[i];
     delete[] data;
 }
 
@@ -80,11 +80,15 @@ void NTable<T>::deleteRow(int index){
 
 template<typename T>
 bool NTable<T>::insertCol(int index, const QVector<T>& col){
+    if(!rowMax){
+        rowNum = col.size();
+        rowMax = col.size();
+    }
     if(index>colNum||rowNum!=col.size())
         return false;
     int i,j;
     if(colNum>=colMax){
-        int l = colMax+(colMax>>1);
+        int l = colMax+qMax(1,(colMax>>1));
         T *r;
         for(i=0;i<rowNum;++i){
             r = new T[l];
@@ -107,22 +111,28 @@ bool NTable<T>::insertCol(int index, const QVector<T>& col){
 
 template<typename T>
 bool NTable<T>::insertRow(int index, const QVector<T>& row){
+    //deb<<rowNum<<' '<<rowMax<<' '<<colNum<<' '<<colMax;
+    if(!colMax){
+        colNum = row.size();
+        colMax = row.size();
+    }
     if(index>rowNum||colNum!=row.size())
         return false;
     int i;
     if(rowNum>=rowMax){
-        int l = rowMax+(rowMax>>1);
+        int l = rowMax+qMax(1,(rowMax>>1));
         T **d = new T*[l];
         for(i=0;i<rowNum;++i)
             d[i] = data[i];
-        delete[] data;
+        if(data)
+            delete[] data;
         data = d;
         rowMax = l;
     }
 
-    for(i=rowNum;i>index;--i)
+    for(i=rowNum-1;i>index;--i)
         data[i] = data[i-1];
-    data[index] = new T[colNum];
+    data[index] = new T[colMax];
     for(i=0;i<colNum;++i)
         data[index][i]=row[i];
     ++rowNum;

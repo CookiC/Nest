@@ -5,7 +5,10 @@
 
 int main(int argc, char *argv[]){
     deb<<"Programm start!";
+
 //  StandardData::test();
     NImage::test();
+
+    deb << "Program end!";
     return 0;
 }

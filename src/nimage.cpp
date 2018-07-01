@@ -4,49 +4,47 @@ void NImage::delete_data(void * info) {
     delete (uchar*)info;
 }
 
-QImage &NImage::fitImage(QImage &image, int width, int height, NImage::Fit fit, QColor color) {
-    QImage* fittedImage;
+QImage NImage::fitImage(QImage &image, int width, int height, NImage::Fit fit, QColor color) {
+                        QImage fittedImage;
 
     if(!(width | height)) {
-        fittedImage = new QImage(image);
+        fittedImage = QImage(image);
     }else{
         if(!width) width = image.width();
         if(!height) height = image.height();
-        fittedImage = new QImage();
         switch(fit) {
         //TODO other fit
         case Fit_Stretch:
-            *fittedImage = image.scaled(width, height);
+            fittedImage = image.scaled(width, height);
             break;
         default:
             break;
         }
     }
 
-    return *fittedImage;
+    return fittedImage;
 }
 
-QVector<double> &NImage::qImageToStandardRow(QImage &image, int width, int height,
-                                             NImage::Fit fit, QColor color)
+QVector<double> NImage::qImageToStandardRow(QImage &image, int width, int height,
+                                            NImage::Fit fit, QColor color)
 {
     QImage fittedImage = fitImage(image, width, height, fit, color);
     if(fittedImage.isNull()) {
         //TODO error handling
-        throw "something smells fishy..";
     }
 
     uchar* bits = fittedImage.bits();
     int widthInByte = (fittedImage.width() + 3) / 4 * 4;
-    QVector<double>* row = new QVector<double>();
+    QVector<double> row = QVector<double>();
     for(int i = 0; i < fittedImage.sizeInBytes(); i++) {
         if(i % widthInByte < fittedImage.width())
-            row->append(double(bits[i]));
+            row.append(double(bits[i]));
     }
 
-    return *row;
+    return row;
 }
 
-QVector<double> &NImage::loadStandardRow(QString path, int width, int height, QImage::Format format,
+QVector<double> NImage::loadStandardRow(QString path, int width, int height, QImage::Format format,
                                          NImage::Fit fit, QColor color)
 {
     QImage image = QImage(path);
@@ -59,7 +57,7 @@ QVector<double> &NImage::loadStandardRow(QString path, int width, int height, QI
     return qImageToStandardRow(image, width, height, fit, color);
 }
 
-QImage &NImage::standardRowToQImage(StandardData &stdData, int index,
+QImage NImage::standardRowToQImage(StandardData &stdData, int index,
                                     int width, int height, QImage::Format format)
 {
     return standardRowToQImage(stdData.getRow(index), width, height, format);
@@ -71,7 +69,7 @@ void NImage::saveStandardRow(StandardData &stdData, QString path, int index, int
     saveStandardRow(stdData.getRow(index), path, width, height, format);
 }
 
-QImage &NImage::standardRowToQImage(QVector<double> row, int width, int height, QImage::Format format)
+QImage NImage::standardRowToQImage(QVector<double> row, int width, int height, QImage::Format format)
 {
     int widthInByte = (width + 3) / 4 * 4, i, j;
 
@@ -82,9 +80,9 @@ QImage &NImage::standardRowToQImage(QVector<double> row, int width, int height, 
         }
     }
 
-    QImage* image = new QImage(bits, width, height, format, delete_data, bits);
+    QImage image = QImage(bits, width, height, format, delete_data, bits);
 
-    return *image;
+    return image;
 }
 
 void NImage::saveStandardRow(QVector<double> row, QString path, int width, int height,
@@ -94,10 +92,10 @@ void NImage::saveStandardRow(QVector<double> row, QString path, int width, int h
     image.save(path);
 }
 
-StandardData &NImage::qImageToStandardData(QVector<QImage> &images, int width, int height,
-                                           NImage::Fit fit, QColor color)
+StandardData NImage::qImageToStandardData(QVector<QImage> &images, int width, int height,
+                                          NImage::Fit fit, QColor color)
 {
-    StandardData* stdData = new StandardData();
+    StandardData stdData = StandardData();
     if(!width || !height) {
         bool w = !width, h = !height;
         for(auto itr = images.begin(); itr < images.end(); itr++) {
@@ -110,14 +108,14 @@ StandardData &NImage::qImageToStandardData(QVector<QImage> &images, int width, i
     int i;
     for(i = 0; i < images.size(); i++) {
         row = qImageToStandardRow(images[i], width, height, fit, color);
-        stdData->appendRow(row, QString::number(i));
+        stdData.appendRow(row, QString::number(i));
     }
 
-    return *stdData;
+    return stdData;
 }
 
-StandardData &NImage::loadStandardData(QStringList &paths, int width, int height,
-                                       QImage::Format format, NImage::Fit fit, QColor color)
+StandardData NImage::loadStandardData(QStringList &paths, int width, int height,
+                                      QImage::Format format, NImage::Fit fit, QColor color)
 {
     QVector<QImage> images = QVector<QImage>();
     for(auto itr = paths.begin(); itr < paths.end();itr++) {
@@ -127,8 +125,8 @@ StandardData &NImage::loadStandardData(QStringList &paths, int width, int height
     return qImageToStandardData(images, width, height, fit, color);
 }
 
-StandardData &NImage::loadStandardData(QString folderPath, int width, int height,
-                                       QImage::Format format, NImage::Fit fit, QColor color)
+StandardData NImage::loadStandardData(QString folderPath, int width, int height,
+                                      QImage::Format format, NImage::Fit fit, QColor color)
 {
     //TODO image formats
     if(folderPath.endsWith("/")) folderPath.chop(1);
@@ -144,17 +142,17 @@ StandardData &NImage::loadStandardData(QString folderPath, int width, int height
     return loadStandardData(paths, width, height, format, fit, color);
 }
 
-QVector<QImage> &NImage::standardDataToQImage(StandardData &stdData, int width, int height,
-                                              int start, int end, QImage::Format format)
+QVector<QImage> NImage::standardDataToQImage(StandardData &stdData, int width, int height,
+                                             int start, int end, QImage::Format format)
 {
-    QVector<QImage>* images = new QVector<QImage>();
+    QVector<QImage> images = QVector<QImage>();
 
     if(!end) end = stdData.getRowNum();
     for(int i = start; i < end; i++) {
-        images->append(standardRowToQImage(stdData, i, width, height, format));
+        images.append(standardRowToQImage(stdData, i, width, height, format));
     }
 
-    return *images;
+    return images;
 }
 
 void NImage::saveStandardData(StandardData &stdData, QVector<QString> &paths, int width, int height,
@@ -175,12 +173,7 @@ void NImage::saveStandardData(StandardData &stdData, QString name, int width, in
 }
 
 void NImage::test() {
-    QVector<double> row = loadStandardRow("../images/test1.png", 100, 100);
-    saveStandardRow(row, "../images/test2.png", 100, 100);
-
-    StandardData stdData = loadStandardData("../images");
-
-    deb << stdData.getColNum() << stdData.getRowNum();
-
-    saveStandardData(stdData, "../images/test%d.o.png", 100, 100);
+    StandardData testData = StandardData();
+    testData.loadCsv("../../tests/data/test.csv", true, false);
+    //saveStandardData(testData, "../../test/images/data%d.png", 28, 28);
 }

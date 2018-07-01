@@ -133,7 +133,7 @@ template<typename T>
 QVector<T> NTable<T>::getCol(int j){
     QVector<T> col;
     for(int i=0;i<rowNum;++i)
-        col.append(date[i][j]);
+        col.append(data[i][j]);
     return col;
 }
 

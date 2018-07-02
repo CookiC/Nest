@@ -19,6 +19,7 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QThread>
+#include <QTime>
 #include <QVector>
 #include <QImage>
 #include <QDir>

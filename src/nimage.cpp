@@ -174,6 +174,10 @@ void NImage::saveStandardData(StandardData &stdData, QString name, int width, in
 
 void NImage::test() {
     StandardData testData = StandardData();
+    QTime time;
+    time.start();
     testData.loadCsv("../../tests/data/test.csv", true, false);
+    testData.saveCsv("../../tests/data/test1.csv");
+    deb<<time.elapsed()<<"ms";
     //saveStandardData(testData, "../../test/images/data%d.png", 28, 28);
 }

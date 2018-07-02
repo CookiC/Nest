@@ -33,6 +33,7 @@ protected:
 
 public:
     AbstractData();
+    ~AbstractData();
 
     bool appendCol(const QVector<T>& col, const QString& name);
     bool appendRow(const QVector<T>& col, const QString& name);
@@ -54,6 +55,11 @@ public:
 template <typename T>
 AbstractData<T>::AbstractData(){
     y=0;
+}
+
+template <typename T>
+AbstractData<T>::~AbstractData(){
+    deb<<"delete AbstractData";
 }
 
 template <typename T>
@@ -145,6 +151,7 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
             deb<<"Load fail!";
             return false;
         }
+
     }
     deb<<"Load Success!";
     file.close();

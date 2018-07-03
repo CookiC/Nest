@@ -52,6 +52,7 @@ bool CARTClassifier::cmp(const int &x,const int &y){
 }
 
 int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate){
+    /*
     if(pCate.size()<=1){
         pool.append(Node(static_cast<int>(pCate.firstKey()),1));
         return pool.size()-1;
@@ -126,7 +127,7 @@ int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &
                 rMaxInst = rInst;
             }
         }while(tmp != lInst[0]);
-    }
+    }*/
     return 1;
 }
 

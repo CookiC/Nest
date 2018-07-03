@@ -8,17 +8,17 @@ class NTable{
 private:
     int colMax;
     int rowMax;
-    T **data;
-    NTable<T> *parent;
-    QVector<NTable<T>*> son;
+    void moveCol(int newMax);
+    void moveRow(int newMax);
 
 protected:
+    T **data;
     int colNum;
     int rowNum;
 
 public:
     NTable();
-    NTable(int rowNum, int colNum);
+    NTable(int rowMax, int colMax);
     ~NTable();
 
     void deleteCol(int i);
@@ -27,9 +27,9 @@ public:
     bool insertRow(int i, const QVector<T>& row);
     QVector<T> getCol(int j);
     QVector<T> getRow(int i);
+    void release();
 
     //inline
-    T& at(int i,int j);
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
     const T& get(int i,int j) const;
@@ -41,12 +41,14 @@ public:
     const T* operator [] (int i)const;
 };
 
+//public
+
 template<typename T>
-NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr),parent(nullptr){
+NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr){
 }
 
 template<typename T>
-NTable<T>::NTable(int rowMax, int colMax):colNum(0),rowNum(0),colMax(colMax),rowMax(rowMax),data(nullptr),parent(nullptr){
+NTable<T>::NTable(int rowMax, int colMax):colNum(0),rowNum(0),colMax(colMax),rowMax(rowMax),data(nullptr){
     data = new *T[rowMax];
     for(int i=0;i<rowMax;++i)
         data[i] = new T[colMax];
@@ -87,18 +89,10 @@ bool NTable<T>::insertCol(int index, const QVector<T>& col){
     }
     if(index>colNum||rowNum!=col.size())
         return false;
-    int i,j;
-    if(colNum>=colMax){
-        colMax = colMax+qMax(1,(colMax>>1));
-        T *r;
-        for(i=0;i<rowNum;++i){
-            r = new T[colMax];
-            memcpy(r,data[i],sizeof(T)*colNum);
-            delete[] data[i];
-            data[i] = r;
-        }
-    }
+    if(colNum>=colMax)
+        moveCol(colMax+qMax(1,(colMax>>1)));
 
+    int i,j;
     for(i=0;i<rowNum;++i){
         for(j=colNum;j>index;--j)
             data[i][j]=data[i][j-1];
@@ -116,17 +110,10 @@ bool NTable<T>::insertRow(int index, const QVector<T>& row){
     }
     if(index>rowNum||colNum!=row.size())
         return false;
-    int i;
-    if(rowNum>=rowMax){
-        rowMax = rowMax+qMax(1,(rowMax>>1));
-        T **d = new T*[rowMax];
-        memcpy(d,data,sizeof(T*)*rowNum);
-        if(data)
-            delete[] data;
-        data = d;
-    }
+    if(rowNum>=rowMax)
+        moveRow(rowMax+qMax(1,(rowMax>>1)));
 
-    for(i=rowNum-1;i>index;--i)
+    for(int i=rowNum-1;i>index;--i)
         data[i] = data[i-1];
     data[index] = new T[colMax];
     memcpy(data[index],row.data(),sizeof(T)*colNum);
@@ -151,8 +138,13 @@ QVector<T> NTable<T>::getRow(int i){
 }
 
 template<typename T>
-inline T& NTable<T>::at(int i,int j){
-    return data[i][j];
+void NTable<T>::release(){
+    if(data){
+        if(rowNum<rowMax)
+            moveRow(rowNum);
+        if(colNum<colMax)
+            moveCol(colNum);
+    }
 }
 
 template<typename T>
@@ -194,5 +186,28 @@ inline T* NTable<T>::operator [] (int i){
 template<typename T>
 inline const T* NTable<T>::operator [] (int i)const{
     return data[i];
+}
+
+//private
+template<typename T>
+void NTable<T>::moveCol(int newMax){
+    colMax = newMax;
+    T *r;
+    for(int i=0;i<rowNum;++i){
+        r = new T[colMax];
+        memcpy(r,data[i],sizeof(T)*colNum);
+        delete[] data[i];
+        data[i] = r;
+    }
+}
+
+template<typename T>
+void NTable<T>::moveRow(int newMax){
+    rowMax = newMax;
+    T **d = new T*[rowMax];
+    memcpy(d,data,sizeof(T*)*rowNum);
+    if(data)
+        delete[] data;
+    data = d;
 }
 #endif // NTABLE_H

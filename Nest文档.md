@@ -21,13 +21,15 @@
 
 ## Attention
 
-1. 在C++中内联函数和模板类的定义都必须放在头文件中，否则编译失败，声明请与定义分开。
+1. C++中内联函数和模板类的定义都必须放在头文件中，否则编译失败，声明请与定义分开。
+2. 函数中在堆区申请的变量作为返回值请返回指针或值，不要返回引用。
+3. 函数中不要返回局部变量的指针或引用，只能返回值。
 
 ## Base Classes
 
 ### NTable\<T>
 
-​	二维表，支持时间复杂度*O(N)*的行列删除和*O(N+M)*的行列插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。采用了内存回收机制，删除的列或行并不会直接将内存返还给系统，而是在析构时才将内存返还，以达到在删除后再次插入无需再向系统申请内存。可进一步优化内存。
+​	二维表，支持时间复杂度*O(N)*的行删除、*O(N\*M)*的列删除、*O(N)*的行插入，空间复杂度为*O(N\*M)*，可以说是逼近下限了。
 
 #### public
 
@@ -47,19 +49,20 @@
 
   在尾部添加行。
 
-* **T& at(int i,int j);**
+* **T& at(int i,int j)**
 
   返回对应索引的引用。
 
-* **const T& get(int i,int j) const;**
+* **const T& get(int i,int j) const**
 
   返回对应索引的常量值，建议日常使用该函数，与at区分开来。
 
-* **int getColNum();**
+* **int getColNum()**
+* **const T* getCRow(int i)**
 
-* **int getRowNum();**
+* **int getRowNum()**
 
-* **void set(int i,int j,const T& value);**
+* **void set(int i,int j,const T& value)**
 
   设置对应索引值。
 

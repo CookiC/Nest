@@ -3,7 +3,7 @@
 #include "standarddata.h"
 #include "nimage.cpp"
 
-int main(int argc, char *argv[]){
+int main(){
     deb<<"Programm start!";
 
 //  StandardData::test();

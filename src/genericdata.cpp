@@ -54,7 +54,7 @@ void GenericData::colStrSplit(int index, const QString& delimiter, int rank){
             list.append("");
         else{
             list.append(get(i,j).left(j));
-            at(i,j).remove(0,j+k);
+            data[i][j].remove(0,j+k);
         }
     }
     insertCol(index,list,name);

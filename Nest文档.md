@@ -19,6 +19,10 @@
 1. 实现了NTable模板类
 2. 更改了编译选项，可以使用debug模式了，不过不会链接到python了，如果需要链接，要更改编译选项。
 
+### Ash v1.15
+
+1. 取消了*NTable\<T>::at()*函数
+
 ## Attention
 
 1. C++中内联函数和模板类的定义都必须放在头文件中，否则编译失败，声明请与定义分开。
@@ -49,15 +53,12 @@
 
   在尾部添加行。
 
-* **T& at(int i,int j)**
-
-  返回对应索引的引用。
-
 * **const T& get(int i,int j) const**
 
   返回对应索引的常量值，建议日常使用该函数，与at区分开来。
 
 * **int getColNum()**
+
 * **const T* getCRow(int i)**
 
 * **int getRowNum()**
@@ -70,6 +71,9 @@
 
 * **int getRowNum()**
 
+* **void release()**
+
+  释放空闲空间。
 ### NString
 
 在遥远的计划中的类，用以替代内存消耗巨大的QString类以及使用不怎么方便的std:tring类。
@@ -106,13 +110,7 @@
 
   保存csv文件（文件名及路径）
 
-* **void setY(int i)**
-
-  设置目标属性。
-
-* **int getY()**
-
-  返回目标属性。
+* **AbstractData\<T>\* cutCol(const QVector\<int> &colIndex)**
 
 #### protected
 * **bool colNameFlag**
@@ -147,10 +145,6 @@
 将支持csv、arff的读入与保存。需开发arff文件读入。
 
 #### public
-
-* **bool appendRow(const QStringList &row, const QString &name = "")**
-
-  向尾部添加行（行数据，行名），返回是否添加成功。
 
 * **void colStrSplit(int index, const QRegularExpression &regExp)**
 

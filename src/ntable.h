@@ -18,27 +18,28 @@ protected:
 
 public:
     NTable();
-    NTable(int rowMax, int colMax);
+    NTable(int rowNum, int colNum);
     ~NTable();
 
+    bool appendCol(const QVector<T>& col);
+    bool appendRow(const QVector<T>& row);
+    NTable<T>* cutCol(int colIndex);
+    NTable<T>* cutCol(const QVector<int> &colIndex);
     void deleteCol(int i);
     void deleteRow(int i);
     bool insertCol(int i, const QVector<T>& col);
     bool insertRow(int i, const QVector<T>& row);
-    QVector<T> getCol(int j);
-    QVector<T> getRow(int i);
-    void release();
-
-    //inline
-    bool appendCol(const QVector<T>& col);
-    bool appendRow(const QVector<T>& row);
     const T& get(int i,int j) const;
+    QVector<T> getCol(int j);
     int getColNum();
-    const T* getCRow(int i);
+    const T* getConstRow(int i);
+    QVector<T> getRow(int i);
     int getRowNum();
+    void release();
+    void resize(int rowSize, int colSize);
 
-    T* operator [] (int i);
-    const T* operator [] (int i)const;
+    T*          operator [] (int i);
+    const T*    operator [] (int i)const;
 };
 
 //public
@@ -48,10 +49,10 @@ NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr){
 }
 
 template<typename T>
-NTable<T>::NTable(int rowMax, int colMax):colNum(0),rowNum(0),colMax(colMax),rowMax(rowMax),data(nullptr){
-    data = new *T[rowMax];
-    for(int i=0;i<rowMax;++i)
-        data[i] = new T[colMax];
+NTable<T>::NTable(int rowNum, int colNum):colNum(colNum),rowNum(rowNum),colMax(colNum),rowMax(rowNum),data(nullptr){
+    data = new *T[rowNum];
+    for(int i=0;i<rowNum;++i)
+        data[i] = new T[colNum];
 }
 
 
@@ -62,6 +63,49 @@ NTable<T>::~NTable(){
         delete[] data[i];
     delete[] data;
     deb<<"NTable delete";
+}
+
+template<typename T>
+inline bool NTable<T>::appendCol(const QVector<T>& col){
+    return insertCol(colNum,col);
+}
+
+template<typename T>
+inline bool NTable<T>::appendRow(const QVector<T>& row){
+    return insertRow(rowNum,row);
+}
+
+template<typename T>
+NTable<T>* NTable<T>::cutCol(int colIndex){
+    int i,j;
+    NTable<T> *cut = new NTable<T>(rowNum,1);
+    for(i=0;i<rowNum;++i){
+        cut[i][0] = data[i][colIndex];
+        for(j=colIndex;j+1<colNum;++j)
+            data[i][j]=data[i][j+1];
+    }
+    --colNum;
+    return cut;
+}
+
+template<typename T>
+NTable<T>* NTable<T>::cutCol(const QVector<int> &colIndex){
+    int i,j,k;
+    int cutSize = colIndex.size();
+    NTable<T> *cut = new NTable<T>(rowNum,cutSize);
+    qSort(colIndex.begin(),colIndex.end());
+    for(i=0;i<rowNum;++i){
+        for(j=0;j<cutSize;++j)
+            cut[i][j] = data[i][colIndex[j]];
+        k=0;
+        for(j=colIndex[0];j+k<colNum;++j){
+            if(k<cutSize&&j==colIndex[k])
+                ++k;
+            data[i][j]=data[i][j+k];
+        }
+    }
+    colNum -= cutSize;
+    return cut;
 }
 
 template<typename T>
@@ -122,6 +166,11 @@ bool NTable<T>::insertRow(int index, const QVector<T>& row){
 }
 
 template<typename T>
+inline const T& NTable<T>::get(int i,int j) const{
+    return data[i][j];
+}
+
+template<typename T>
 QVector<T> NTable<T>::getCol(int j){
     QVector<T> col;
     for(int i=0;i<rowNum;++i)
@@ -146,21 +195,20 @@ void NTable<T>::release(){
             moveCol(colNum);
     }
 }
-
 template<typename T>
-inline bool NTable<T>::appendCol(const QVector<T>& col){
-    return insertCol(colNum,col);
-}
-
-template<typename T>
-inline bool NTable<T>::appendRow(const QVector<T>& row){
-    return insertRow(rowNum,row);
-}
-
-
-template<typename T>
-inline const T& NTable<T>::get(int i,int j) const{
-    return data[i][j];
+void NTable<T>::resize(int rowSize, int colSize){
+    if(rowSize>rowMax){
+        moveRow(rowSize);
+        rowNum = rowSize;
+    }
+    else
+        rowNum = rowSize;
+    if(colSize>colNum){
+        moveCol(colSize);
+        colNum = colSize;
+    }
+    else
+        colNum = colSize;
 }
 
 template<typename T>
@@ -169,7 +217,7 @@ inline int NTable<T>::getColNum(){
 }
 
 template<typename T>
-inline const T* NTable<T>::getCRow(int i){
+inline const T* NTable<T>::getConstRow(int i){
     return data[i];
 }
 
@@ -189,6 +237,7 @@ inline const T* NTable<T>::operator [] (int i)const{
 }
 
 //private
+
 template<typename T>
 void NTable<T>::moveCol(int newMax){
     colMax = newMax;
@@ -210,4 +259,5 @@ void NTable<T>::moveRow(int newMax){
         delete[] data;
     data = d;
 }
+
 #endif // NTABLE_H

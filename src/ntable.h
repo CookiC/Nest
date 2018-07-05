@@ -8,8 +8,10 @@ class NTable{
 private:
     int colMax;
     int rowMax;
-    void moveCol(int newMax);
-    void moveRow(int newMax);
+    T *pool;
+    void move(int newRowMax,int newColMax);
+    void moveColBackward(int index);
+    void moveRowBackward(int index);
 
 protected:
     T **data;
@@ -45,23 +47,22 @@ public:
 //public
 
 template<typename T>
-NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr){
+NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr),pool(nullptr){
 }
 
 template<typename T>
 NTable<T>::NTable(int rowNum, int colNum):colNum(colNum),rowNum(rowNum),colMax(colNum),rowMax(rowNum),data(nullptr){
-    data = new *T[rowNum];
-    for(int i=0;i<rowNum;++i)
-        data[i] = new T[colNum];
+    pool = new T[rowMax*colMax];
+    data = new T*[rowMax];
+    for(int i=0;i<rowMax;++i)
+        data[i] = &pool[i*colMax];
 }
 
 
 template<typename T>
 NTable<T>::~NTable(){
-    int i;
-    for(i=0;i<rowNum;++i)
-        delete[] data[i];
     delete[] data;
+    delete[] pool;
     deb<<"NTable delete";
 }
 
@@ -119,10 +120,10 @@ void NTable<T>::deleteCol(int index){
 
 template<typename T>
 void NTable<T>::deleteRow(int index){
-    int i;
+    int i,j;
     --rowNum;
     for(i=index;i<rowNum;++i)
-        data[i]=data[i+1];
+        memcpy(data[i],data[i+1],sizeof(T)*colNum);
 }
 
 template<typename T>
@@ -134,15 +135,11 @@ bool NTable<T>::insertCol(int index, const QVector<T>& col){
     if(index>colNum||rowNum!=col.size())
         return false;
     if(colNum>=colMax)
-        moveCol(colMax+qMax(1,(colMax>>1)));
+        move(rowMax,colMax+qMax(1,(colMax>>1)));
 
-    int i,j;
-    for(i=0;i<rowNum;++i){
-        for(j=colNum;j>index;--j)
-            data[i][j]=data[i][j-1];
+    moveColBackward(index);
+    for(int i=0;i<rowNum;++i)
         data[i][index]=col[i];
-    }
-    ++colNum;
     return true;
 }
 
@@ -155,13 +152,10 @@ bool NTable<T>::insertRow(int index, const QVector<T>& row){
     if(index>rowNum||colNum!=row.size())
         return false;
     if(rowNum>=rowMax)
-        moveRow(rowMax+qMax(1,(rowMax>>1)));
+        move(rowMax+qMax(1,(rowMax>>1)),colMax);
 
-    for(int i=rowNum-1;i>index;--i)
-        data[i] = data[i-1];
-    data[index] = new T[colMax];
+    moveRowBackward(index);
     memcpy(data[index],row.data(),sizeof(T)*colNum);
-    ++rowNum;
     return true;
 }
 
@@ -188,27 +182,20 @@ QVector<T> NTable<T>::getRow(int i){
 
 template<typename T>
 void NTable<T>::release(){
-    if(data){
-        if(rowNum<rowMax)
-            moveRow(rowNum);
-        if(colNum<colMax)
-            moveCol(colNum);
-    }
+    if(pool&&(rowNum<rowMax||colNum<colMax))
+        move(rowNum,colNum);
 }
 template<typename T>
 void NTable<T>::resize(int rowSize, int colSize){
-    if(rowSize>rowMax){
-        moveRow(rowSize);
+    if(rowSize>rowMax||colSize>colMax){
+        move(rowSize,colSize);
         rowNum = rowSize;
-    }
-    else
-        rowNum = rowSize;
-    if(colSize>colNum){
-        moveCol(colSize);
         colNum = colSize;
     }
-    else
+    else{
+        rowNum = rowSize;
         colNum = colSize;
+    }
 }
 
 template<typename T>
@@ -239,25 +226,37 @@ inline const T* NTable<T>::operator [] (int i)const{
 //private
 
 template<typename T>
-void NTable<T>::moveCol(int newMax){
-    colMax = newMax;
-    T *r;
-    for(int i=0;i<rowNum;++i){
-        r = new T[colMax];
-        memcpy(r,data[i],sizeof(T)*colNum);
-        delete[] data[i];
-        data[i] = r;
+void NTable<T>::move(int newRowMax,int newColMax){
+    rowMax = newRowMax;
+    colMax = newColMax;
+    int i;
+    T *newPool = new T[rowMax*colMax];
+    T **newData = new T*[rowMax];
+    for(i=0;i<rowMax;++i)
+        newData[i] = &newPool[i*colMax];
+    if(pool){
+        for(i=0;i<rowNum;++i)
+            memcpy(newData[i],data[i],sizeof(T)*colNum);
+        delete[] pool;
+        delete[] data;
     }
+    pool = newPool;
+    data = newData;
 }
 
 template<typename T>
-void NTable<T>::moveRow(int newMax){
-    rowMax = newMax;
-    T **d = new T*[rowMax];
-    memcpy(d,data,sizeof(T*)*rowNum);
-    if(data)
-        delete[] data;
-    data = d;
+void NTable<T>::moveColBackward(int index){
+    int i,j;
+    for(i=0;i<rowNum;++i)
+        for(j=colNum;j>index;--j)
+            data[i][j]=data[i][j-1];
+    ++colNum;
 }
 
+template<typename T>
+void NTable<T>::moveRowBackward(int index){
+    for(int i=rowNum;i>index;--i)
+        memcpy(data[i],data[i-1],sizeof(T)*colNum);
+    ++rowNum;
+}
 #endif // NTABLE_H

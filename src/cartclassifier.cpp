@@ -48,7 +48,7 @@ void CARTClassifier::predict(StandardData *data, NTable<int> *hard, NTable<doubl
 }
 
 bool CARTClassifier::cmp(const int &x,const int &y){
-    return train->get(x,attr)<train->get(y,attr);
+    return dataX[x][attr]<dataX[y][attr];
 }
 
 int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate){

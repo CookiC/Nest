@@ -6,14 +6,14 @@
 class AbstractClassifier{
 public:
     AbstractClassifier();
-    void fit(StandardData *data);
+    void fit(StandardData *trainX,StandardData *trainY);
     virtual NTable<int> predictHard(StandardData *data) = 0;
     virtual NTable<double> predictSoft(StandardData *data) = 0;
     virtual void predict(StandardData *data, NTable<int> *hard, NTable<double> *soft) = 0;
 
 protected:
-    StandardData *train;
-    StandardData *test;
+    StandardData *dataX;
+    StandardData *dataY;
     int attrNum;
 
     virtual void fit() = 0;

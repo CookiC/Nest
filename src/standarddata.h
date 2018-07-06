@@ -9,12 +9,17 @@ private:
     bool **missing;
     char *attrCategory;
     QStringVector *nomName;
+    uchar **flag;
 
 protected:
     virtual bool loadRow(int i, const QStringVector &row);
     virtual void saveRow(int i, QStringVector& row);
 
 public:
+    enum Flag : uchar{
+        A,B,C
+    };
+
     StandardData();
     ~StandardData();
     void setMissing(int, int);

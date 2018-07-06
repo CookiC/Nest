@@ -39,7 +39,7 @@ bool StandardData::loadRow(int i, const QStringVector &row){
             return false;
         }
     }
-    return NTable::insertRow(i,r);
+    return data.insertRow(i,r);
 }
 
 void StandardData::saveRow(int i, QStringVector& row){

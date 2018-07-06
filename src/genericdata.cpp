@@ -61,7 +61,7 @@ void GenericData::colStrSplit(int index, const QString& delimiter, int rank){
 }
 
 bool GenericData::loadRow(int i, const QStringVector &row){
-    if(!NTable::insertRow(i,row))
+    if(!data.insertRow(i,row))
         return false;
     return true;
 }

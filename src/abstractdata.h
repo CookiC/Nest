@@ -5,7 +5,7 @@
 #include "ntable.h"
 
 template <typename T>
-class AbstractData : public NTable<T>{
+class AbstractData{
 private:
     QVector<int> colNameCnt;
     QVector<int> rowNameCnt;
@@ -13,8 +13,11 @@ private:
     QStringVector rowName;
 
 protected:
+    int colNum;
+    int rowNum;
     bool colNameFlag;
     bool rowNameFlag;
+    NTable<T> data;
 
     void deleteColName(int index);
     void deleteRowName(int index);
@@ -38,21 +41,24 @@ public:
     bool appendRow(const QVector<T>& col, const QString& name);
     void deleteCol(int index);
     void deleteRow(int index);
+    const T& get(int i,int j) const;
+    QVector<T> getCol(int j);
     int getColIndex(const QString& name);
+    int getColNum();
+    QVector<T> getRow(int i);
+    int getRowNum();
     bool insertCol(int index, const QVector<T>& col, const QString& name);
     bool insertRow(int index, const QVector<T>& row, const QString& name);
     bool loadCsv(const QString &path, bool hasColName = true, bool hasRowName = false);
     void saveCsv(const QString &);
 
-    //inline
-    void setY(int i);
-    int getY();
-    int getY(int i);
+    T* operator [] (int i);
+    const T* operator [] (int i)const;
 };
 
 //public
 template <typename T>
-AbstractData<T>::AbstractData(){
+AbstractData<T>::AbstractData():rowNum(0),colNum(0){
 }
 
 template <typename T>
@@ -62,32 +68,46 @@ AbstractData<T>::~AbstractData(){
 
 template <typename T>
 bool AbstractData<T>::appendCol(const QVector<T>& col, const QString& name){
-    if(!NTable::appendCol(col))
+    if(!data.appendCol(col))
         return false;
     if(colNameFlag)
         colName.append(name);
+    ++colNum;
     return true;
 }
 
 template <typename T>
 bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
-    if(!NTable::appendRow(col))
+    if(!data.appendRow(col))
         return false;
     if(rowNameFlag)
         rowName.append(name);
+    ++rowNum;
     return true;
 }
 
 template <typename T>
 void AbstractData<T>::deleteCol(int index){
-    NTable::deleteCol(index);
+    data.deleteCol(index);
     deleteColName(index);
+    --colNum;
 }
 
 template <typename T>
 void AbstractData<T>::deleteRow(int index){
-    NTable::deleteRow(index);
+    data.deleteRow(index);
     deleteColName(index);
+    --rowNum;
+}
+
+template <typename T>
+inline const T& AbstractData<T>::get(int i,int j) const{
+    return data.get(i,j);
+}
+
+template <typename T>
+inline QVector<T> AbstractData<T>::getCol(int j){
+    return data.getCol(i);
 }
 
 template <typename T>
@@ -99,20 +119,37 @@ int AbstractData<T>::getColIndex(const QString& name){
 }
 
 template <typename T>
+inline int AbstractData<T>::getColNum(){
+    return colNum;
+}
+
+template <typename T>
+inline QVector<T> AbstractData<T>::getRow(int i){
+    return data.getRow(i);
+}
+
+template <typename T>
+int AbstractData<T>::getRowNum(){
+    return rowNum;
+}
+
+template <typename T>
 bool AbstractData<T>::insertCol(int index, const QVector<T>& col, const QString& name){
-    if(!NTable::insertCol(index,col))
+    if(!data.insertCol(index,col))
         return false;
     if(colNameFlag)
         insertColName(index,name);
+    ++colNum;
     return true;
 }
 
 template <typename T>
 bool AbstractData<T>::insertRow(int index, const QVector<T>& row, const QString& name){
-    if(!NTable::insertRow(index,row))
+    if(!data.insertRow(index,row))
         return false;
     if(rowNameFlag)
         insertRowName(index,name);
+    ++rowNum;
     return true;
 }
 
@@ -135,6 +172,7 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
         row = splitCsvLine(line,name);
         for(i=0;i<row.size();++i)
             colName.append(row[i]);
+        colNum = colName.size();
     }
 
     deb<<"Colhead load Success!";
@@ -149,7 +187,7 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
             deb<<"Load fail!";
             return false;
         }
-
+        ++rowNum;
     }
     deb<<"Load Success!";
     file.close();
@@ -189,7 +227,15 @@ void AbstractData<T>::saveCsv(const QString &filePath){
     file.close();
 }
 
-//public inline
+template <typename T>
+T* AbstractData<T>::operator [] (int i){
+    return data[i];
+}
+
+template <typename T>
+const T* AbstractData<T>::operator [] (int i)const{
+    return data[i];
+}
 
 //protect
 

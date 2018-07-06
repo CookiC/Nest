@@ -9,7 +9,8 @@ bool AbstractClassifier::compareAttr(StandardData *data){
     return true;
 }
 
-void AbstractClassifier::fit(StandardData *data){
-    train = data;
+void AbstractClassifier::fit(StandardData *trainX, StandardData *trainY){
+    dataX = trainX;
+    dataY = trainY;
     fit();
 }

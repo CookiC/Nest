@@ -2,44 +2,52 @@
 
 //public
 
-StandardData::StandardData():
-    missing(nullptr),attrCategory(nullptr),nomName(nullptr){
+StandardData::StandardData():flag(nullptr),nomName(nullptr){
 }
 
 StandardData::~StandardData(){
-    if(missing){
-        for(int i=0;i<rowNum;++i)
-            delete[] missing[i];
-        delete[] missing;
-    }
-    if(attrCategory)
-        delete[] attrCategory;
+    if(flag)
+        delete[] flag;
     if(nomName)
         delete[] nomName;
 }
 
-void StandardData::setMissing(int i,int j){
-    if(!missing){
-        missing = new bool*[rowNum];
-        for(int k=0;k<rowNum;++k){
-            missing[k] = new bool[colNum];
-            memset(missing, 0, sizeof(missing[k]));
-        }
-    }
-    missing[i][j]=true;
+StandardData* StandardData::cutCol(int colIndex){
+    StandardData *cut = new StandardData();
+
+    cut->data = data->cutCol(colIndex);
+    return cut;
+}
+
+StandardData* StandardData::cutCol(QVector<int> &colIndex){
+    StandardData *cut = new StandardData();
+    cut->data = data->cutCol(colIndex);
+    return cut;
+}
+
+//protect
+
+void StandardData::allocateMemory(){
+    flag = new Category*[rowNum];
+    for(int i=0;i<rowNum;++i)
+        flag[i] = new Category[colNum];
 }
 
 bool StandardData::loadRow(int i, const QStringVector &row){
     bool ok;
     QVector<double> r;
-    for(QString s:row){
-        r.append(s.toDouble(&ok));
-        if(!ok){
-            deb<<"Has string!";
-            return false;
+    for(int j=0;j<row.size();++j)
+        if(row[j].isEmpty())
+            flag[i][j] = MISS;
+        else{
+            flag[i][j] = NUM;
+            r.append(row[j].toDouble(&ok));
+            if(!ok){
+                deb<<"Load row wrong!The row maybe has string can't convert to double!";
+                return false;
+            }
         }
-    }
-    return data.insertRow(i,r);
+    return data->insertRow(i,r);
 }
 
 void StandardData::saveRow(int i, QStringVector& row){

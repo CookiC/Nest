@@ -12,24 +12,25 @@ private:
     QStringVector colName;
     QStringVector rowName;
 
+    QStringVector splitCsvLine(const QByteArray &line, QString& name);
 protected:
     int colNum;
     int rowNum;
     bool colNameFlag;
     bool rowNameFlag;
-    NTable<T> data;
+    NTable<T> *data;
 
-    void deleteColName(int index);
-    void deleteRowName(int index);
-    void insertColName(int index, const QString& name);
-    void insertRowName(int index, const QString& name);
-    QStringVector splitCsvLine(const QByteArray &line, QString& name);
-
-    //inline
     void appendColName(const QString& name);
     void appendRowName(const QString& name);
+    void cutColNameFrom(AbstractData* src, QVector<int> &colIndex);
+    void deleteColName(int index);
     const QString& getColName(int i);
+    void deleteRowName(int index);
     const QString& getRowName(int i);
+    void insertColName(int index, const QString& name);
+    void insertRowName(int index, const QString& name);
+
+    virtual void allocateMemory();
     virtual bool loadRow(int i, const QStringVector &row) = 0;
     virtual void saveRow(int i, QStringVector& row) = 0;
 
@@ -67,8 +68,12 @@ AbstractData<T>::~AbstractData(){
 }
 
 template <typename T>
+void AbstractData<T>::allocateMemory(){
+}
+
+template <typename T>
 bool AbstractData<T>::appendCol(const QVector<T>& col, const QString& name){
-    if(!data.appendCol(col))
+    if(!data->appendCol(col))
         return false;
     if(colNameFlag)
         colName.append(name);
@@ -78,7 +83,7 @@ bool AbstractData<T>::appendCol(const QVector<T>& col, const QString& name){
 
 template <typename T>
 bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
-    if(!data.appendRow(col))
+    if(!data->appendRow(col))
         return false;
     if(rowNameFlag)
         rowName.append(name);
@@ -87,27 +92,31 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
 }
 
 template <typename T>
+void AbstractData<T>::cutColNameFrom(AbstractData* src, QVector<int> &colIndex){
+}
+
+template <typename T>
 void AbstractData<T>::deleteCol(int index){
-    data.deleteCol(index);
+    data->deleteCol(index);
     deleteColName(index);
     --colNum;
 }
 
 template <typename T>
 void AbstractData<T>::deleteRow(int index){
-    data.deleteRow(index);
+    data->deleteRow(index);
     deleteColName(index);
     --rowNum;
 }
 
 template <typename T>
 inline const T& AbstractData<T>::get(int i,int j) const{
-    return data.get(i,j);
+    return data->get(i,j);
 }
 
 template <typename T>
 inline QVector<T> AbstractData<T>::getCol(int j){
-    return data.getCol(i);
+    return data->getCol(i);
 }
 
 template <typename T>
@@ -125,7 +134,7 @@ inline int AbstractData<T>::getColNum(){
 
 template <typename T>
 inline QVector<T> AbstractData<T>::getRow(int i){
-    return data.getRow(i);
+    return data->getRow(i);
 }
 
 template <typename T>
@@ -135,7 +144,7 @@ int AbstractData<T>::getRowNum(){
 
 template <typename T>
 bool AbstractData<T>::insertCol(int index, const QVector<T>& col, const QString& name){
-    if(!data.insertCol(index,col))
+    if(!data->insertCol(index,col))
         return false;
     if(colNameFlag)
         insertColName(index,name);
@@ -145,7 +154,7 @@ bool AbstractData<T>::insertCol(int index, const QVector<T>& col, const QString&
 
 template <typename T>
 bool AbstractData<T>::insertRow(int index, const QVector<T>& row, const QString& name){
-    if(!data.insertRow(index,row))
+    if(!data->insertRow(index,row))
         return false;
     if(rowNameFlag)
         insertRowName(index,name);
@@ -175,7 +184,8 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
         colNum = colName.size();
     }
 
-    deb<<"Colhead load Success!";
+    deb<<"Colhead load success!";
+    allocateMemory();
     for(i=0;!file.atEnd();++i) {
         line = file.readLine();
         row = splitCsvLine(line,name);
@@ -229,12 +239,12 @@ void AbstractData<T>::saveCsv(const QString &filePath){
 
 template <typename T>
 T* AbstractData<T>::operator [] (int i){
-    return data[i];
+    return (*data)[i];
 }
 
 template <typename T>
 const T* AbstractData<T>::operator [] (int i)const{
-    return data[i];
+    return (*data)[i];
 }
 
 //protect

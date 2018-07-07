@@ -23,10 +23,11 @@ public:
     NTable(int rowNum, int colNum);
     ~NTable();
 
+    T& at(const int &i, const int &j);
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
     NTable<T>* cutCol(int colIndex);
-    NTable<T>* cutCol(const QVector<int> &colIndex);
+    NTable<T>* cutCol(QVector<int> &colIndex);
     void deleteCol(int i);
     void deleteRow(int i);
     bool insertCol(int i, const QVector<T>& col);
@@ -39,12 +40,18 @@ public:
     int getRowNum();
     void release();
     void resize(int rowSize, int colSize);
+    void set(int i, int j, T value);
 
-    T*          operator [] (int i);
-    const T*    operator [] (int i)const;
+    T* operator [] (int i);
+    const T* operator [] (int i)const;
 };
 
 //public
+
+template<typename T>
+inline T& NTable<T>::at(const int &i,const int &j){
+    return data[i][j];
+}
 
 template<typename T>
 NTable<T>::NTable():colNum(0),rowNum(0),colMax(0),rowMax(0),data(nullptr),pool(nullptr){
@@ -81,7 +88,7 @@ NTable<T>* NTable<T>::cutCol(int colIndex){
     int i,j;
     NTable<T> *cut = new NTable<T>(rowNum,1);
     for(i=0;i<rowNum;++i){
-        cut[i][0] = data[i][colIndex];
+        cut->set(i,0,data[i][colIndex]);
         for(j=colIndex;j+1<colNum;++j)
             data[i][j]=data[i][j+1];
     }
@@ -90,14 +97,14 @@ NTable<T>* NTable<T>::cutCol(int colIndex){
 }
 
 template<typename T>
-NTable<T>* NTable<T>::cutCol(const QVector<int> &colIndex){
+NTable<T>* NTable<T>::cutCol(QVector<int> &colIndex){
     int i,j,k;
     int cutSize = colIndex.size();
     NTable<T> *cut = new NTable<T>(rowNum,cutSize);
     qSort(colIndex.begin(),colIndex.end());
     for(i=0;i<rowNum;++i){
         for(j=0;j<cutSize;++j)
-            cut[i][j] = data[i][colIndex[j]];
+            cut->set(i,j,data[i][colIndex[j]]);
         k=0;
         for(j=colIndex[0];j+k<colNum;++j){
             if(k<cutSize&&j==colIndex[k])
@@ -211,6 +218,11 @@ inline const T* NTable<T>::getConstRow(int i){
 template<typename T>
 inline int NTable<T>::getRowNum(){
     return rowNum;
+}
+
+template<typename T>
+inline void NTable<T>::set(int i, int j, T value){
+    data[i][j]=value;
 }
 
 template<typename T>

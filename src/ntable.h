@@ -26,8 +26,8 @@ public:
     T& at(const int &i, const int &j);
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
-    NTable<T>* cutCol(int colIndex);
-    NTable<T>* cutCol(QVector<int> &colIndex);
+    void cutColFrom(NTable<T> *src, int colIndex);
+    void cutColFrom(NTable<T> *src, const QVector<int> &colIndex);
     void deleteCol(int i);
     void deleteRow(int i);
     bool insertCol(int i, const QVector<T>& col);
@@ -84,36 +84,34 @@ inline bool NTable<T>::appendRow(const QVector<T>& row){
 }
 
 template<typename T>
-NTable<T>* NTable<T>::cutCol(int colIndex){
+void NTable<T>::cutColFrom(NTable<T> *src,int colIndex){
     int i,j;
-    NTable<T> *cut = new NTable<T>(rowNum,1);
+    resize(src->rowNum,1);
     for(i=0;i<rowNum;++i){
-        cut->set(i,0,data[i][colIndex]);
-        for(j=colIndex;j+1<colNum;++j)
-            data[i][j]=data[i][j+1];
+        data[i][0] = src->data[i][colIndex];
+        for(j=colIndex;j+1<src->colNum;++j)
+            src->data[i][j]=src->data[i][j+1];
     }
-    --colNum;
-    return cut;
+    --src->colNum;
 }
 
 template<typename T>
-NTable<T>* NTable<T>::cutCol(QVector<int> &colIndex){
+void NTable<T>::cutColFrom(NTable<T> *src, const QVector<int> &colIndex){
     int i,j,k;
-    int cutSize = colIndex.size();
-    NTable<T> *cut = new NTable<T>(rowNum,cutSize);
-    qSort(colIndex.begin(),colIndex.end());
+    QVector<int> tmp = colIndex;
+    resize(src->rowNum,colIndex.size());
+    qSort(tmp.begin(),tmp.end());
     for(i=0;i<rowNum;++i){
-        for(j=0;j<cutSize;++j)
-            cut->set(i,j,data[i][colIndex[j]]);
+        for(j=0;j<colNum;++j)
+            data[i][j] = src->data[i][colIndex[j]];
         k=0;
-        for(j=colIndex[0];j+k<colNum;++j){
-            if(k<cutSize&&j==colIndex[k])
+        for(j=tmp[0];j+k<src->colNum;++j){
+            if(k<colNum&&j==tmp[k])
                 ++k;
-            data[i][j]=data[i][j+k];
+            src->data[i][j] = src->data[i][j+k];
         }
     }
-    colNum -= cutSize;
-    return cut;
+    src->colNum -= colNum;
 }
 
 template<typename T>
@@ -194,15 +192,10 @@ void NTable<T>::release(){
 }
 template<typename T>
 void NTable<T>::resize(int rowSize, int colSize){
-    if(rowSize>rowMax||colSize>colMax){
+    if(rowSize>rowMax||colSize>colMax)
         move(rowSize,colSize);
-        rowNum = rowSize;
-        colNum = colSize;
-    }
-    else{
-        rowNum = rowSize;
-        colNum = colSize;
-    }
+    rowNum = qMin(rowNum,rowSize);
+    colNum = qMin(colNum,colSize);
 }
 
 template<typename T>

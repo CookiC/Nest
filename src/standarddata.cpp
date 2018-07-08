@@ -12,17 +12,10 @@ StandardData::~StandardData(){
         delete[] nomName;
 }
 
-StandardData* StandardData::cutCol(int colIndex){
-    StandardData *cut = new StandardData();
-
-    cut->data = data->cutCol(colIndex);
-    return cut;
+void StandardData::cutColFrom(StandardData *src, int colIndex){
 }
 
-StandardData* StandardData::cutCol(QVector<int> &colIndex){
-    StandardData *cut = new StandardData();
-    cut->data = data->cutCol(colIndex);
-    return cut;
+void StandardData::cutColFrom(StandardData *src, QVector<int> &colIndex){
 }
 
 //protect

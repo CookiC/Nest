@@ -7,8 +7,8 @@
 template <typename T>
 class AbstractData{
 private:
-    QVector<int> colNameCnt;
-    QVector<int> rowNameCnt;
+    //QVector<int> colNameCnt;
+    //QVector<int> rowNameCnt;
     QStringVector colName;
     QStringVector rowName;
 
@@ -22,7 +22,7 @@ protected:
 
     void appendColName(const QString& name);
     void appendRowName(const QString& name);
-    void cutColNameFrom(AbstractData* src, QVector<int> &colIndex);
+    void cutColFrom(AbstractData* src, const QVector<int> &colIndex);
     void deleteColName(int index);
     const QString& getColName(int i);
     void deleteRowName(int index);
@@ -36,6 +36,7 @@ protected:
 
 public:
     AbstractData();
+    AbstractData(int rowNum, int colNum);
     ~AbstractData();
 
     bool appendCol(const QVector<T>& col, const QString& name);
@@ -60,6 +61,12 @@ public:
 //public
 template <typename T>
 AbstractData<T>::AbstractData():rowNum(0),colNum(0){
+    data = new NTable<T>;
+}
+
+template <typename T>
+AbstractData<T>::AbstractData(int rowNum, int colNum):rowNum(rowNum),colNum(colNum){
+    data = new NTable<T>(rowNum,colNum);
 }
 
 template <typename T>
@@ -92,7 +99,28 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
 }
 
 template <typename T>
-void AbstractData<T>::cutColNameFrom(AbstractData* src, QVector<int> &colIndex){
+void AbstractData<T>::cutColFrom(AbstractData* src, const QVector<int> &colIndex){
+    rowNum = src->rowNum;
+    colNum = colIndex.size();
+    rowNameFlag = src->rowNameFlag;
+    colNameFlag = src->colNameFlag;
+    rowName.clear();
+    colName.clear();
+    if(rowNameFlag)
+        rowName.append(src->rowName);
+    if(colNameFlag){
+        QVector<int> tmp = colIndex;
+        qSort(tmp.begin(),tmp.end());
+        for(auto i:colIndex)
+            colName.append(src->colName[i]);
+        int i,j=0;
+        for(i=tmp[0];i+j<src->colNum;++i){
+            if(j<colNum&&i==tmp[j])
+                ++j;
+            src->colName[i] = src->colName[i+j];
+        }
+    }
+    data->cutColFrom(src->data,colIndex);
 }
 
 template <typename T>

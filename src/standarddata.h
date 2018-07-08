@@ -29,8 +29,8 @@ public:
 
     //inline
     void addNomName(int i, const QString &name);
-    StandardData* cutCol(int colIndex);
-    StandardData* cutCol(QVector<int> &colIndex);
+    void cutColFrom(StandardData *src, int colIndex);
+    void cutColFrom(StandardData *src, QVector<int> &colIndex);
     static void test();
 };
 

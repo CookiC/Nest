@@ -31,6 +31,7 @@ public:
     void addNomName(int i, const QString &name);
     void cutColFrom(StandardData *src, int colIndex);
     void cutColFrom(StandardData *src, QVector<int> &colIndex);
+
     static void test();
 };
 

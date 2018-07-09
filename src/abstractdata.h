@@ -22,6 +22,7 @@ protected:
 
     void appendColName(const QString& name);
     void appendRowName(const QString& name);
+    void cutColFrom(AbstractData* src, int colIndex);
     void cutColFrom(AbstractData* src, const QVector<int> &colIndex);
     void deleteColName(int index);
     const QString& getColName(int i);
@@ -96,6 +97,23 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
         rowName.append(name);
     ++rowNum;
     return true;
+}
+
+template <typename T>
+void AbstractData<T>::cutColFrom(AbstractData* src, int colIndex){
+    rowNum = src->rowNum;
+    colNum = 1;
+    rowNameFlag = src->rowNameFlag;
+    colNameFlag = src->colNameFlag;
+    rowName.clear();
+    colName.clear();
+    if(rowNameFlag)
+        rowName.append(src->rowName);
+    if(colNameFlag){
+        colName.append(src->colName[colIndex]);
+        src->colName.remove(colIndex);
+    }
+    data->cutColFrom(src->data,colIndex);
 }
 
 template <typename T>

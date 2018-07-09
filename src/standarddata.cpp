@@ -13,9 +13,18 @@ StandardData::~StandardData(){
 }
 
 void StandardData::cutColFrom(StandardData *src, int colIndex){
+    AbstractData::cutColFrom(src, colIndex);
+    allocateMemory();
+    int i,j;
+    for(i=0;i<rowNum;++i){
+        flag[i][0] = src->flag[i][colIndex];
+        for(j=colIndex+1; j<src->colNum; ++j)
+            flag[i][j-1] = flag[i][j];
+    }
 }
 
 void StandardData::cutColFrom(StandardData *src, QVector<int> &colIndex){
+    AbstractData::cutColFrom(src,colIndex);
 }
 
 //protect
@@ -49,6 +58,9 @@ void StandardData::saveRow(int i, QStringVector& row){
         row.append(QString::number(get(i,j)));
 }
 
+//private
+
+//test
 void StandardData::test(){
     StandardData stdData;
     stdData.loadCsv("E:/scientific research/experiment/data/Digit Recognizer/train.csv",1,0);

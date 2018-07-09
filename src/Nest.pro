@@ -37,7 +37,8 @@ SOURCES += \
     nstring.cpp \
     abstractclassifier.cpp \
     cartclassifier.cpp \
-    nimage.cpp
+    nimage.cpp \
+    abstractestimate.cpp
 
 HEADERS += \
     cpython.h \
@@ -50,7 +51,8 @@ HEADERS += \
     ntable.h \
     abstractclassifier.h \
     cartclassifier.h \
-    nimage.h
+    nimage.h \
+    abstractestimate.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

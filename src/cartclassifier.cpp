@@ -48,32 +48,36 @@ void CARTClassifier::predict(StandardData *data, NTable<int> *hard, NTable<doubl
 }
 
 bool CARTClassifier::cmp(const int &x,const int &y){
-    return dataX[x][attr]<dataX[y][attr];
+    return trainX[x][attr]<trainX[y][attr];
 }
 
-int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &pAttr, const QMap<double,int> &pCate){
-    /*
-    if(pCate.size()<=1){
-        pool.append(Node(static_cast<int>(pCate.firstKey()),1));
+int CARTClassifier::treeGenerate(const QVector<int> &parInst, const QVector<int> &parAttr, const QMap<double,int> &parCate){
+/* This function returns the index of new node in the memory pool.
+
+    //Instances are all in the same category.
+    if(parCate.size()<=1){
+        pool.append(Node(static_cast<int>(parCate.firstKey()),1));
         return pool.size()-1;
     }
 
+    //Instances in the different categories have the same value.
     bool same;
-    QVector<int> sAttr;
+    //SonAttr records different categories in parInst.
+    QVector<int> sonAttr;
     int i,j;
-    for(j=0;j<pAttr.size();++j){
+    for(j=0;j<parAttr.size();++j){
         same=true;
-        for(i=0;i<pInst.size()-1&&same;++i)
-            if(train->get(pInst[i],pAttr[j])!=train->get(pInst[i+1],pAttr[j]))
+        for(i=0;i<parInst.size()-1&&same;++i)
+            if(trainX->get(parInst[i],parAttr[j])!=trainX->get(parInst[i+1],parAttr[j]))
                 same = false;
         if(!same)
-            sAttr.append(pAttr[i]);
+            sonAttr.append(parAttr[i]);
     }
-    double n = pInst.size();
+    double n = parInst.size();
     int maxCate=0;
     double maxProb=0;
     double prob;
-    for(auto e = pCate.cbegin();e!=pCate.cend();++e){
+    for(auto e = parCate.cbegin();e!=parCate.cend();++e){
         prob = e.value()/n;
         if(prob>maxProb){
             maxCate = e.key();
@@ -81,20 +85,20 @@ int CARTClassifier::treeGenerate(const QVector<int> &pInst, const QVector<int> &
         }
     }
     pool.append(Node(maxCate,maxProb));
-    if(!sAttr.size())
+    if(!sonAttr.size())
         return pool.size()-1;
 
     Node &node = pool.last();
     double tmp;
     double g=0;
     double maxG=0;
-    QList<int> lInst = pInst.toList();
+    QList<int> lInst = parInst.toList();
     QList<int> rInst;
     QList<int> lMaxInst;
     QList<int> rMaxInst;
     QMap<double, int> lCate;
     QMap<double, int> rCate;
-    for(auto J:pAttr){
+    for(auto J:parAttr){
         attr = J;
         quickSort(lInst.begin(),lInst.end());
         for(auto I:lInst)

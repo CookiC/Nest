@@ -10,7 +10,7 @@ bool AbstractClassifier::compareAttr(StandardData *data){
 }
 
 void AbstractClassifier::fit(StandardData *trainX, StandardData *trainY){
-    dataX = trainX;
-    dataY = trainY;
+    this->trainX = trainX;
+    this->trainY = trainY;
     fit();
 }

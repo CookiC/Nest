@@ -12,8 +12,8 @@ public:
     virtual void predict(StandardData *data, NTable<int> *hard, NTable<double> *soft) = 0;
 
 protected:
-    StandardData *dataX;
-    StandardData *dataY;
+    StandardData *trainX;
+    StandardData *trainY;
     int attrNum;
 
     virtual void fit() = 0;

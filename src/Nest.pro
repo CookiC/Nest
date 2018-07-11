@@ -52,7 +52,8 @@ HEADERS += \
     abstractclassifier.h \
     cartclassifier.h \
     nimage.h \
-    abstractestimate.h
+    abstractestimate.h \
+    abstracttable.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

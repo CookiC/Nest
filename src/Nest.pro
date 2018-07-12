@@ -53,8 +53,7 @@ HEADERS += \
     cartclassifier.h \
     nimage.h \
     abstractestimate.h \
-    ntableslice.h \
-    ntablemanager.h
+    ntableblock.h
 
 #指定生成的应用程序放置的目录
 DESTDIR = ./bin

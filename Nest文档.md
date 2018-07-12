@@ -74,6 +74,28 @@
 * **void release()**
 
   释放空闲空间。
+### NTableBlock\<T>
+
+#### public
+
+* **bool insertCol(int index, const QVector\<T>& col)**
+
+  插入列。进入时判断data是否为空，确保在以后的操作中data始终不为空。
+
+* **bool insertRow(int index, const QVector\<T>& row)**
+
+  插入行。进入时判断data是否为空，确保在以后的操作中data始终不为空。
+
+#### private
+
+* **void moveCol(int colMax)**
+
+  移动列并删除引用数为0的列，data指针必须不为空。
+
+* **void moveRow(int rowMax)**
+
+  移动行并删除引用数为0的行，data指针必须不为空。
+
 ### NString
 
 在遥远的计划中的类，用以替代内存消耗巨大的QString类以及使用不怎么方便的std:tring类。

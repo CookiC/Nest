@@ -34,5 +34,4 @@ using ll = long long;
 using ull = unsigned long long;
 using QStringVector = QVector<QString>;
 using QBArrayVector = QVector<QByteArray>;
-
 #endif // HEADER_H

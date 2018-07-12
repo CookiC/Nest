@@ -23,9 +23,9 @@ public:
     NTable(int rowNum, int colNum);
     ~NTable();
 
-    T& at(const int &i, const int &j);
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
+    T& at(const int &i, const int &j);
     void cutColFrom(NTable<T> *src, int colIndex);
     void cutColFrom(NTable<T> *src, const QVector<int> &colIndex);
     void deleteCol(int i);
@@ -38,6 +38,7 @@ public:
     const T* getConstRow(int i);
     QVector<T> getRow(int i);
     int getRowNum();
+    T* getVarRow(int index);
     void release();
     void resize(int rowSize, int colSize);
     void set(int i, int j, T value);
@@ -116,19 +117,16 @@ void NTable<T>::cutColFrom(NTable<T> *src, const QVector<int> &colIndex){
 
 template<typename T>
 void NTable<T>::deleteCol(int index){
-    int i,j;
+    for(int i=0;i<rowNum;++i)
+        memmove(data[i]+index,data[i]+index+1,sizeof(T)*(colNum-index-1));
     --colNum;
-    for(i=0;i<rowNum;++i)
-        for(j=index;j<colNum;++j)
-            data[i][j]=data[i][j+1];
 }
 
 template<typename T>
 void NTable<T>::deleteRow(int index){
-    int i,j;
+    for(int i=index;i<rowNum;++i)
+        memmove(data+i,data+i+1,sizeof(T)*colNum);
     --rowNum;
-    for(i=index;i<rowNum;++i)
-        memcpy(data[i],data[i+1],sizeof(T)*colNum);
 }
 
 template<typename T>
@@ -183,6 +181,11 @@ QVector<T> NTable<T>::getRow(int i){
     for(int j=0;j<colNum;++j)
         row.append(data[i][j]);
     return row;
+}
+
+template <typename T>
+inline T* NTable<T>::getVarRow(int index){
+    return data+index;
 }
 
 template<typename T>

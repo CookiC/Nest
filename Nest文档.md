@@ -78,6 +78,10 @@
 
 #### public
 
+* **NTableBlock(int rowNum = 0, int colNum = 0)**
+
+  内存块的最小容量是1*1，即rowMax和colMax的最小值为1。
+
 * **bool insertCol(int index, const QVector\<T>& col)**
 
   插入列。进入时判断data是否为空，确保在以后的操作中data始终不为空。
@@ -90,11 +94,11 @@
 
 * **void moveCol(int colMax)**
 
-  移动列并删除引用数为0的列，data指针必须不为空。
+  移动列并删除引用数为0的列，data指针必须不为空。当原colNum大于移动后的colMax，会出现bug。
 
 * **void moveRow(int rowMax)**
 
-  移动行并删除引用数为0的行，data指针必须不为空。
+  移动行并删除引用数为0的行，data指针必须不为空。当原rowNum大于移动后的rowMax，会出现bug。
 
 ### NString
 

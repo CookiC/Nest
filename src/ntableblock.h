@@ -27,8 +27,8 @@ public:
     NTableBlock(uint rowNum = 0, uint colNum = 0);
     ~NTableBlock();
 
-    void addColQuote(uint from, uint to);
-    void addRowQuote(uint from, uint to);
+    void addColQuote(uint index);
+    void addRowQuote(uint index);
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
     T& at(const int &i, const int &j);
@@ -91,15 +91,13 @@ NTableBlock<T>::~NTableBlock(){
 }
 
 template<typename T>
-void NTableBlock<T>::addColQuote(uint from, uint to){
-    for(int i=from;i<to;++i)
-        ++colQuote[i];
+inline void NTableBlock<T>::addColQuote(uint index){
+    ++colQuote[index];
 }
 
 template<typename T>
-void NTableBlock<T>::addRowQuote(uint from, uint to){
-    for(int i=from;i<to;++i)
-        ++rowQuote[i];
+inline void NTableBlock<T>::addRowQuote(uint index){
+    ++rowQuote[index];
 }
 
 template<typename T>

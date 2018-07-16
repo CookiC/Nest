@@ -32,8 +32,8 @@ public:
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
     T& at(const int &i, const int &j);
-    void deleteColQuote(int i);
-    void deleteRowQuote(int i);
+    void deleteColQuote(int index);
+    void deleteRowQuote(int index);
     bool insertCol(int index, const QVector<T>& col);
     bool insertRow(int index, const QVector<T>& row);
     const T& get(int i,int j) const;

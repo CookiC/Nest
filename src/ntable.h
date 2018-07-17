@@ -19,8 +19,10 @@ public:
 
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
+    T& at(const int &i, const int &j);
     NTableBlock<T>* cutCol(uint colRank);
     NTableBlock<T>* cutRow(uint rowRank);
+    const T& get(const int &i,const int &j) const;
     NTableBlock<T>* select(const QVector<T>& rowRank,const QVector<T>& colRank);
 };
 
@@ -59,6 +61,11 @@ bool NTable<T>::appendRow(const QVector<T>& row){
 }
 
 template <typename T>
+inline T& NTable<T>::at(const int &i, const int &j){
+    return data->at(i,j);
+}
+
+template <typename T>
 NTableBlock<T>* NTable<T>::cutCol(uint colRank){
     NTable<T> *cut = new NTable(data,rowNum,colNum);
     memcpy(cut->rowIndex,rowIndex,sizeof(uint)*rowNum);
@@ -76,6 +83,11 @@ NTableBlock<T>* NTable<T>::cutRow(uint rowRank){
     memmove(rowIndex+rowRank, rowIndex+rowRank+1, sizeof(uint)*(rowNum-rowRank-1));
     data->addColQuote(rowRank);
     return cut;
+}
+
+template <typename T>
+inline const T& NTable<T>::get(const int &i, const int &j) const{
+    return data->get(i,j);
 }
 
 template <typename T>

@@ -23,6 +23,8 @@ public:
     NTableBlock<T>* cutCol(uint colRank);
     NTableBlock<T>* cutRow(uint rowRank);
     const T& get(const int &i,const int &j) const;
+    bool insertCol(int index, const QVector<T>& col);
+    bool insertRow(int index, const QVector<T>& row);
     NTableBlock<T>* select(const QVector<T>& rowRank,const QVector<T>& colRank);
 };
 
@@ -88,6 +90,26 @@ NTableBlock<T>* NTable<T>::cutRow(uint rowRank){
 template <typename T>
 inline const T& NTable<T>::get(const int &i, const int &j) const{
     return data->get(i,j);
+}
+
+template <typename T>
+bool NTable<T>::insertCol(int index, const QVector<T>& col){
+    if(!data->appendCol(col))
+        return false;
+    uint n = data->getColNum()-1;
+    data->addColQuote(n);
+    colIndex.insert(index, n);
+    return true;
+}
+
+template <typename T>
+bool NTable<T>::insertRow(int index, const QVector<T>& row){
+    if(!data->appendRow(row))
+        return false;
+    uint n = data->getRowNum()-1;
+    data->addRowQuote(n);
+    rowIndex.insert(index, n);
+    return true;
 }
 
 template <typename T>

@@ -32,15 +32,15 @@ public:
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
     T& at(const int &i, const int &j);
-    void deleteColQuote(int index);
-    void deleteRowQuote(int index);
-    bool insertCol(int index, const QVector<T>& col);
-    bool insertRow(int index, const QVector<T>& row);
+    void deleteColQuote(uint index);
+    void deleteRowQuote(uint index);
+    bool insertCol(uint index, const QVector<T>& col);
+    bool insertRow(uint index, const QVector<T>& row);
     const T& get(int i,int j) const;
     QVector<T> getCol(int j);
     int getColNum();
     const T* getConstRow(int i);
-    QVector<T> getRow(int i);
+    QVector<T> getRow(uint index);
     int getRowNum();
     T* getVarRow(int index);
     void release();
@@ -56,7 +56,7 @@ public:
 
 template<typename T>
 NTableBlock<T>::NTableBlock(uint rowNum, uint colNum){
-    int i;
+    uint i;
     this->colNum = colNum;
     this->rowNum = rowNum;
     if(!colNum)
@@ -116,7 +116,7 @@ inline T& NTableBlock<T>::at(const int &i,const int &j){
 }
 
 template<typename T>
-void NTableBlock<T>::deleteColQuote(int index){
+void NTableBlock<T>::deleteColQuote(uint index){
     --colQuote[index];
     ++colDel;
     if(colNum-colDel<=(colMax>>1))
@@ -124,34 +124,34 @@ void NTableBlock<T>::deleteColQuote(int index){
 }
 
 template<typename T>
-void NTableBlock<T>::deleteRowQuote(int index){
+void NTableBlock<T>::deleteRowQuote(uint index){
     for(int i=index;i<rowNum;++i)
         memmove(data+i,data+i+1,sizeof(T)*colNum);
     --rowNum;
 }
 
 template<typename T>
-bool NTableBlock<T>::insertCol(int index, const QVector<T>& col){
+bool NTableBlock<T>::insertCol(uint index, const QVector<T>& col){
     if(rowNum)
         moveRow(col.size());
     if(index>colNum||rowNum!=col.size())
         return false;
     if(colNum>=colMax)
-        moveCol(colMax+qMax(1,(colMax>>1)));
+        moveCol(colMax+qMax(1u,colMax>>1));
     moveColBackward(index);
-    for(int i=0;i<rowNum;++i)
+    for(uint i=0;i<rowNum;++i)
         data[i][index]=col[i];
     return true;
 }
 
 template<typename T>
-bool NTableBlock<T>::insertRow(int index, const QVector<T>& row){
+bool NTableBlock<T>::insertRow(uint index, const QVector<T>& row){
     if(colNum)
         moveCol(row.size());
     if(index>rowNum||colNum!=row.size())
         return false;
     if(rowNum>=rowMax)
-        moveRow(rowMax+qMax(1,(rowMax>>1)));
+        moveRow(rowMax+qMax(1u,rowMax>>1));
     moveRowBackward(index);
     memmove(data[index],row.data(),sizeof(T)*colNum);
     return true;
@@ -171,10 +171,10 @@ QVector<T> NTableBlock<T>::getCol(int j){
 }
 
 template<typename T>
-QVector<T> NTableBlock<T>::getRow(int i){
+QVector<T> NTableBlock<T>::getRow(uint index){
     QVector<T> row;
-    for(int j=0;j<colNum;++j)
-        row.append(data[i][j]);
+    for(uint j=0;j<colNum;++j)
+        row.append(data[index][j]);
     return row;
 }
 
@@ -244,7 +244,7 @@ void NTableBlock<T>::moveCol(int colMax){
         colMax = 1;
     if(colMax == this->colMax)
         return;
-    int i,j,k;
+    uint i,j,k;
     T *row;
     for(i=0;i<rowNum;++i){
         k=0;
@@ -258,13 +258,13 @@ void NTableBlock<T>::moveCol(int colMax){
         data[i] = row;
     }
 
-    row = new T[colMax];
+    uint *quote = new uint[colMax];
     for(j=0;j+k<colNum;++j){
         if(!colQuote[j])
             ++k;
-        row[j] = colQuote[j+k];
+        quote[j] = colQuote[j+k];
     }
-    colQuote = row;
+    colQuote = quote;
 
     colNum -= colDel;
     colDel = 0;
@@ -277,7 +277,7 @@ void NTableBlock<T>::moveRow(int rowMax){
         rowMax = 1;
     if(rowMax == this->rowMax)
         return;
-    int i,k;
+    uint i,k;
     T **data = new T*[rowMax];
     k=0;
     for(i=0;i+k<rowNum;++i){
@@ -288,13 +288,13 @@ void NTableBlock<T>::moveRow(int rowMax){
     delete[] this->data;
     this->data = data;
 
-    T *col = new T[rowMax];
+    uint *quote = new uint[rowMax];
     for(i=0;i+k<rowNum;++i){
         if(!rowQuote[i])
             ++k;
-        col[i] = rowQuote[i+k];
+        quote[i] = rowQuote[i+k];
     }
-    rowQuote = col;
+    rowQuote = quote;
 
     rowNum -= rowDel;
     rowDel = 0;
@@ -309,9 +309,8 @@ void NTableBlock<T>::move(int rowMax,int colMax){
 
 template<typename T>
 void NTableBlock<T>::moveColBackward(int index){
-    int i;
     memmove(colQuote+index+1,colQuote+index,sizeof(uint)*(colNum-index));
-    for(i=0;i<rowNum;++i)
+    for(uint i=0;i<rowNum;++i)
         memmove(data[i]+index+1,data[i]+index,sizeof(T)*(colNum-index));
     ++colNum;
 }

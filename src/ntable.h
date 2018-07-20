@@ -19,10 +19,13 @@ public:
 
     bool appendCol(const QVector<T>& col);
     bool appendRow(const QVector<T>& row);
-    T& at(const int &i, const int &j);
-    NTableBlock<T>* cutCol(uint colRank);
-    NTableBlock<T>* cutRow(uint rowRank);
-    const T& get(const int &i,const int &j) const;
+    T& at(int i, int j);
+    NTableBlock<T>* cutCol(uint index);
+    NTableBlock<T>* cutRow(uint index);
+    void deleteCol(uint index);
+    void deleteRow(uint index);
+    const T& get(int i,int j) const;
+    QVector<T> getRow(int index);
     bool insertCol(int index, const QVector<T>& col);
     bool insertRow(int index, const QVector<T>& row);
     NTableBlock<T>* select(const QVector<T>& rowRank,const QVector<T>& colRank);
@@ -31,8 +34,8 @@ public:
 //public
 
 template <typename T>
-NTable<T>::NTable(uint rowNum, uint colNum):colNum(colNum),rowNum(rowNum){
-    data = new NTableBlock(rowNum, colNum);
+NTable<T>::NTable(uint rowNum, uint colNum){
+    data = new NTableBlock<T>(rowNum, colNum);
     colIndex.resize(colNum);
     rowIndex.resize(rowNum);
     uint i;
@@ -63,33 +66,50 @@ bool NTable<T>::appendRow(const QVector<T>& row){
 }
 
 template <typename T>
-inline T& NTable<T>::at(const int &i, const int &j){
+inline T& NTable<T>::at(int i, int j){
     return data->at(i,j);
 }
 
 template <typename T>
-NTableBlock<T>* NTable<T>::cutCol(uint colRank){
+NTableBlock<T>* NTable<T>::cutCol(uint index){
     NTable<T> *cut = new NTable(data,rowNum,colNum);
     memcpy(cut->rowIndex,rowIndex,sizeof(uint)*rowNum);
-    cut->colIndex[0] = colIndex[colRank];
-    memmove(colIndex+colRank,colIndex+colRank+1,sizeof(uint)*(colNum-colRank-1));
-    data->addColQuote(colRank);
+    cut->colIndex[0] = colIndex[index];
+    memmove(colIndex+index,colIndex+index+1,sizeof(uint)*(colNum-index-1));
+    data->addColQuote(index);
     return cut;
 }
 
 template <typename T>
-NTableBlock<T>* NTable<T>::cutRow(uint rowRank){
+NTableBlock<T>* NTable<T>::cutRow(uint index){
     NTable<T> *cut = new NTable(data,rowNum,colNum);
     memcpy(cut->colIndex, colIndex, sizeof(uint)*colNum);
-    cut->rowIndex[0] = rowIndex[rowRank];
-    memmove(rowIndex+rowRank, rowIndex+rowRank+1, sizeof(uint)*(rowNum-rowRank-1));
-    data->addColQuote(rowRank);
+    cut->rowIndex[0] = rowIndex[index];
+    memmove(rowIndex+index, rowIndex+index+1, sizeof(uint)*(rowNum-index-1));
+    data->addColQuote(index);
     return cut;
 }
 
 template <typename T>
-inline const T& NTable<T>::get(const int &i, const int &j) const{
+inline void NTable<T>::deleteCol(uint index){
+    data->deleteColQuote(colIndex[index]);
+    colIndex.remove(index);
+}
+
+template <typename T>
+inline void NTable<T>::deleteRow(uint index){
+    data->deleteRowQuote(rowIndex[index]);
+    rowIndex.remove(index);
+}
+
+template <typename T>
+inline const T& NTable<T>::get(int i, int j) const{
     return data->get(i,j);
+}
+
+template <typename T>
+inline QVector<T> NTable<T>::getRow(int index){
+    return data->getRow(index);
 }
 
 template <typename T>

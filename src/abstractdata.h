@@ -20,10 +20,9 @@ protected:
     bool rowNameFlag;
     NTable<T> *data;
 
-    void appendColName(const QString& name);
-    void appendRowName(const QString& name);
-    void cutColFrom(AbstractData* src, int colIndex);
-    void cutColFrom(AbstractData* src, const QVector<int> &colIndex);
+    void appendColName(const QString &name);
+    void appendRowName(const QString &name);
+    void cutCol(AbstractData *des, int colIndex);
     void deleteColName(int index);
     const QString& getColName(int i);
     void deleteRowName(int index);
@@ -100,45 +99,20 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
 }
 
 template <typename T>
-void AbstractData<T>::cutColFrom(AbstractData* src, int colIndex){
-    rowNum = src->rowNum;
-    colNum = 1;
-    rowNameFlag = src->rowNameFlag;
-    colNameFlag = src->colNameFlag;
-    rowName.clear();
-    colName.clear();
-    if(rowNameFlag)
-        rowName.append(src->rowName);
-    if(colNameFlag){
-        colName.append(src->colName[colIndex]);
-        src->colName.remove(colIndex);
+void AbstractData<T>::cutCol(AbstractData* des, int colIndex){
+    des->rowNum = rowNum;
+    des->colNum = 1;
+    des->rowNameFlag = rowNameFlag;
+    des->colNameFlag = colNameFlag;
+    des->rowName.clear();
+    des->colName.clear();
+    if(des->rowNameFlag)
+        des->rowName.append(rowName);
+    if(des->colNameFlag){
+        des->colName.append(colName[colIndex]);
+        colName.remove(colIndex);
     }
-    data->cutColFrom(src->data,colIndex);
-}
-
-template <typename T>
-void AbstractData<T>::cutColFrom(AbstractData* src, const QVector<int> &colIndex){
-    rowNum = src->rowNum;
-    colNum = colIndex.size();
-    rowNameFlag = src->rowNameFlag;
-    colNameFlag = src->colNameFlag;
-    rowName.clear();
-    colName.clear();
-    if(rowNameFlag)
-        rowName.append(src->rowName);
-    if(colNameFlag){
-        QVector<int> tmp = colIndex;
-        qSort(tmp.begin(),tmp.end());
-        for(auto i:colIndex)
-            colName.append(src->colName[i]);
-        int i,j=0;
-        for(i=tmp[0];i+j<src->colNum;++i){
-            if(j<colNum&&i==tmp[j])
-                ++j;
-            src->colName[i] = src->colName[i+j];
-        }
-    }
-    data->cutColFrom(src->data,colIndex);
+    des->data = data->cutCol(colIndex);
 }
 
 template <typename T>

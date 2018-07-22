@@ -18,6 +18,13 @@ public:
     void setClassifer(AbstractClassifier *classifier);
     //void setMeasure();
     void run();
+
+    static void test();
 };
+
+
+inline void AbstractEstimate::setClassifer(AbstractClassifier *classifier){
+    this->classifier = classifier;
+}
 
 #endif // ABSTRACTESTIMATE_H

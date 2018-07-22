@@ -14,24 +14,22 @@ public:
 
 private:
     QStringVector *nomName;
-    Category **flag;
+    NTable<Category> flag;
 
 protected:
-    void allocateMemory() override;
     bool loadRow(int i, const QStringVector &row) override;
     void saveRow(int i, QStringVector& row) override;
 public:
-
-
-    StandardData();
+    StandardData(int rowNum = 0, int colNum = 0);
     ~StandardData();
-    void setMissing(int, int);
 
     //inline
     void addNomName(int i, const QString &name);
-    void cutColFrom(StandardData *src, int colIndex);
-    void cutColFrom(StandardData *src, QVector<int> &colIndex);
+    StandardData* cutColFrom(const QVector<int> &colIndex);
+    const NTable<Category>& getFlag();
+    void setMissing(int, int);
 
+    static void cutCol(StandardData *des, StandardData *src, int index);
     static void test();
 };
 
@@ -40,5 +38,8 @@ inline void StandardData::addNomName(int i, const QString &name){
     nomName[i].append(name);
 }
 
+inline const NTable<StandardData::Category>& StandardData::getFlag(){
+    return flag;
+}
 
 #endif // STANDARDDATA_H

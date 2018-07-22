@@ -18,11 +18,10 @@ protected:
     int rowNum;
     bool colNameFlag;
     bool rowNameFlag;
-    NTable<T> *data;
+    NTable<T> data;
 
     void appendColName(const QString &name);
     void appendRowName(const QString &name);
-    void cutCol(AbstractData *des, int colIndex);
     void deleteColName(int index);
     const QString& getColName(int i);
     void deleteRowName(int index);
@@ -30,13 +29,12 @@ protected:
     void insertColName(int index, const QString& name);
     void insertRowName(int index, const QString& name);
 
-    virtual void allocateMemory();
     virtual bool loadRow(int i, const QStringVector &row) = 0;
     virtual void saveRow(int i, QStringVector& row) = 0;
 
+    static void cutCol(AbstractData *des, AbstractData *src, int index);
 public:
-    AbstractData();
-    AbstractData(int rowNum, int colNum);
+    AbstractData(int rowNum = 0, int colNum = 0);
     ~AbstractData();
 
     bool appendCol(const QVector<T>& col, const QString& name);
@@ -47,6 +45,7 @@ public:
     QVector<T> getCol(int j);
     int getColIndex(const QString& name);
     int getColNum();
+    const NTable<T>& getDate();
     QVector<T> getRow(int i);
     int getRowNum();
     bool insertCol(int index, const QVector<T>& col, const QString& name);
@@ -54,19 +53,13 @@ public:
     bool loadCsv(const QString &path, bool hasColName = true, bool hasRowName = false);
     void saveCsv(const QString &);
 
-    T* operator [] (int i);
-    const T* operator [] (int i)const;
+    //T* operator [] (int i);
+    //const T* operator [] (int i)const;
 };
 
 //public
 template <typename T>
-AbstractData<T>::AbstractData():rowNum(0),colNum(0){
-    data = new NTable<T>;
-}
-
-template <typename T>
-AbstractData<T>::AbstractData(int rowNum, int colNum):rowNum(rowNum),colNum(colNum){
-    data = new NTable<T>(rowNum,colNum);
+AbstractData<T>::AbstractData(int rowNum, int colNum):rowNum(rowNum),colNum(colNum),data(rowNum,colNum){
 }
 
 template <typename T>
@@ -75,12 +68,8 @@ AbstractData<T>::~AbstractData(){
 }
 
 template <typename T>
-void AbstractData<T>::allocateMemory(){
-}
-
-template <typename T>
 bool AbstractData<T>::appendCol(const QVector<T>& col, const QString& name){
-    if(!data->appendCol(col))
+    if(!dataappendCol(col))
         return false;
     if(colNameFlag)
         colName.append(name);
@@ -90,7 +79,7 @@ bool AbstractData<T>::appendCol(const QVector<T>& col, const QString& name){
 
 template <typename T>
 bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
-    if(!data->appendRow(col))
+    if(!data.appendRow(col))
         return false;
     if(rowNameFlag)
         rowName.append(name);
@@ -99,44 +88,44 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
 }
 
 template <typename T>
-void AbstractData<T>::cutCol(AbstractData* des, int colIndex){
-    des->rowNum = rowNum;
+void AbstractData<T>::cutCol(AbstractData *des, AbstractData *src, int index){
+    des->rowNum = src->rowNum;
     des->colNum = 1;
-    des->rowNameFlag = rowNameFlag;
-    des->colNameFlag = colNameFlag;
+    des->rowNameFlag = src->rowNameFlag;
+    des->colNameFlag = src->colNameFlag;
     des->rowName.clear();
     des->colName.clear();
     if(des->rowNameFlag)
-        des->rowName.append(rowName);
+        des->rowName.append(src->rowName);
     if(des->colNameFlag){
-        des->colName.append(colName[colIndex]);
-        colName.remove(colIndex);
+        des->colName.append(src->colName[index]);
+        src->colName.remove(index);
     }
-    des->data = data->cutCol(colIndex);
+    NTable<T>::cutCol(&(des->data), &(src->data), index);
 }
 
 template <typename T>
 void AbstractData<T>::deleteCol(int index){
-    data->deleteCol(index);
+    data.deleteCol(index);
     deleteColName(index);
     --colNum;
 }
 
 template <typename T>
 void AbstractData<T>::deleteRow(int index){
-    data->deleteRow(index);
+    data.deleteRow(index);
     deleteColName(index);
     --rowNum;
 }
 
 template <typename T>
 inline const T& AbstractData<T>::get(int i,int j) const{
-    return data->get(i,j);
+    return data.get(i,j);
 }
 
 template <typename T>
 inline QVector<T> AbstractData<T>::getCol(int j){
-    return data->getCol(i);
+    return data.getCol(i);
 }
 
 template <typename T>
@@ -153,8 +142,13 @@ inline int AbstractData<T>::getColNum(){
 }
 
 template <typename T>
+const NTable<T>& AbstractData::getDate(){
+    return data;
+}
+
+template <typename T>
 inline QVector<T> AbstractData<T>::getRow(int i){
-    return data->getRow(i);
+    return data.getRow(i);
 }
 
 template <typename T>
@@ -164,7 +158,7 @@ int AbstractData<T>::getRowNum(){
 
 template <typename T>
 bool AbstractData<T>::insertCol(int index, const QVector<T>& col, const QString& name){
-    if(!data->insertCol(index,col))
+    if(!data.insertCol(index,col))
         return false;
     if(colNameFlag)
         insertColName(index,name);
@@ -174,7 +168,7 @@ bool AbstractData<T>::insertCol(int index, const QVector<T>& col, const QString&
 
 template <typename T>
 bool AbstractData<T>::insertRow(int index, const QVector<T>& row, const QString& name){
-    if(!data->insertRow(index,row))
+    if(!data.insertRow(index,row))
         return false;
     if(rowNameFlag)
         insertRowName(index,name);
@@ -198,14 +192,13 @@ bool AbstractData<T>::loadCsv(const QString &path, bool hasColName, bool hasRowN
 
     if(colNameFlag){
         line = file.readLine();
+        row.clear();
         row = splitCsvLine(line,name);
-        for(i=0;i<row.size();++i)
-            colName.append(row[i]);
+        colName.append(row);
         colNum = colName.size();
     }
 
     deb<<"Colhead load success!";
-    allocateMemory();
     for(i=0;!file.atEnd();++i) {
         line = file.readLine();
         row = splitCsvLine(line,name);
@@ -257,15 +250,17 @@ void AbstractData<T>::saveCsv(const QString &filePath){
     file.close();
 }
 
+/*
 template <typename T>
 T* AbstractData<T>::operator [] (int i){
-    return (*data)[i];
+    return data[i];
 }
 
 template <typename T>
 const T* AbstractData<T>::operator [] (int i)const{
-    return (*data)[i];
+    return data[i];
 }
+*/
 
 //protect
 

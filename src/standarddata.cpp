@@ -1,55 +1,37 @@
 ﻿#include "standarddata.h"
 
 //public
-
-StandardData::StandardData():flag(nullptr),nomName(nullptr){
+StandardData::StandardData(int rowNum, int colNum):nomName(nullptr),AbstractData(rowNum,colNum){
 }
 
 StandardData::~StandardData(){
-    if(flag)
-        delete[] flag;
     if(nomName)
         delete[] nomName;
 }
 
-void StandardData::cutColFrom(StandardData *src, int colIndex){
-    AbstractData::cutColFrom(src, colIndex);
-    allocateMemory();
-    int i,j;
-    for(i=0;i<rowNum;++i){
-        flag[i][0] = src->flag[i][colIndex];
-        for(j=colIndex+1; j<src->colNum; ++j)
-            flag[i][j-1] = flag[i][j];
-    }
-}
-
-void StandardData::cutColFrom(StandardData *src, QVector<int> &colIndex){
-    AbstractData::cutColFrom(src,colIndex);
+void StandardData::cutCol(StandardData *des, StandardData *src, int index){
+    NTable<Category>::cutCol(&(des->flag),&(src->flag),index);
+    AbstractData::cutCol(des,src,index);
 }
 
 //protect
 
-void StandardData::allocateMemory(){
-    flag = new Category*[rowNum];
-    for(int i=0;i<rowNum;++i)
-        flag[i] = new Category[colNum];
-}
-
-bool StandardData::loadRow(int i, const QStringVector &row){
+bool StandardData::loadRow(int index, const QStringVector &row){
     bool ok;
-    QVector<double> r;
+    QVector<double> dataRow;
+    QVector<Category> flagRow;
     for(int j=0;j<row.size();++j)
         if(row[j].isEmpty())
-            flag[i][j] = MISS;
+            flagRow.append(MISS);
         else{
-            flag[i][j] = NUM;
-            r.append(row[j].toDouble(&ok));
+            flagRow.append(NUM);
+            dataRow.append(row[j].toDouble(&ok));
             if(!ok){
                 deb<<"Load row wrong!The row maybe has string can't convert to double!";
                 return false;
             }
         }
-    return data->insertRow(i,r);
+    return flag.insertRow(index,flagRow)&&data.insertRow(index,dataRow);
 }
 
 void StandardData::saveRow(int i, QStringVector& row){

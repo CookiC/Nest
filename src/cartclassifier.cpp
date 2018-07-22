@@ -32,7 +32,7 @@ CARTClassifier::CARTClassifier(){
 }
 
 void CARTClassifier::fit(){
-
+    treeGenerate(trainX->getDate(),trainX->getFlag(),trainY->getDate(),)
 }
 
 NTable<int> CARTClassifier::predictHard(StandardData *data){
@@ -48,15 +48,15 @@ void CARTClassifier::predict(StandardData *data, NTable<int> *hard, NTable<doubl
 }
 
 bool CARTClassifier::cmp(const int &x,const int &y){
-    return trainX[x][attr]<trainX[y][attr];
+    return trainX->get(x,attr)<trainX->get(y,attr);
 }
 
-int CARTClassifier::treeGenerate(const QVector<int> &parInst, const QVector<int> &parAttr, const QMap<double,int> &parCate){
+int CARTClassifier::treeGenerate(const Inst &instX, const Flag &flagX, const Inst &instY, const QMap<double,int> &cate){
 /* This function returns the index of new node in the memory pool.
-
+*/
     //Instances are all in the same category.
-    if(parCate.size()<=1){
-        pool.append(Node(static_cast<int>(parCate.firstKey()),1));
+    if(cate.size()<=1){
+        pool.append(Node(static_cast<int>(cate.firstKey()),1));
         return pool.size()-1;
     }
 
@@ -131,7 +131,7 @@ int CARTClassifier::treeGenerate(const QVector<int> &parInst, const QVector<int>
                 rMaxInst = rInst;
             }
         }while(tmp != lInst[0]);
-    }*/
+    }
     return 1;
 }
 

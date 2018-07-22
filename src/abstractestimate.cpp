@@ -1,10 +1,7 @@
 ﻿#include "abstractestimate.h"
+#include "cartclassifier.h"
 
-AbstractEstimate::AbstractEstimate(){
-}
-
-void AbstractEstimate::setClassifer(AbstractClassifier *classifier){
-    this->classifier = classifier;
+AbstractEstimate::AbstractEstimate():trainX(nullptr),trainY(nullptr){
 }
 
 void AbstractEstimate::setTrainSet(QString path, int indexY){
@@ -13,9 +10,16 @@ void AbstractEstimate::setTrainSet(QString path, int indexY){
     if(!trainY)
         trainY = new StandardData();
     trainX->loadCsv(path);
-    trainY->cutColFrom(trainX,indexY);
+    StandardData::cutCol(trainY, trainX, indexY);
 }
 
 void AbstractEstimate::run(){
     classifier->fit(trainX,trainY);
+}
+
+void AbstractEstimate::test(){
+    AbstractEstimate est;
+    est.setClassifer(new CARTClassifier());
+    est.setTrainSet("E:/scientific research/experiment/data/Digit Recognizer/train.csv",0);
+    est.run();
 }

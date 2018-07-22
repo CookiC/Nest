@@ -54,14 +54,14 @@ void GenericData::colStrSplit(int index, const QString& delimiter, int rank){
             list.append("");
         else{
             list.append(get(i,j).left(j));
-            data->at(i,j).remove(0,j+k);
+            data.at(i,j).remove(0,j+k);
         }
     }
     insertCol(index,list,name);
 }
 
 bool GenericData::loadRow(int i, const QStringVector &row){
-    if(!data->insertRow(i,row))
+    if(!data.insertRow(i,row))
         return false;
     return true;
 }

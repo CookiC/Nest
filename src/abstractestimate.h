@@ -9,7 +9,8 @@ private:
     AbstractClassifier *classifier;
     StandardData *trainX;
     StandardData *trainY;
-
+    StandardData *testX;
+    StandardData *testY;
 public:
     AbstractEstimate();
 

@@ -152,7 +152,7 @@ inline QVector<T> AbstractData<T>::getRow(int i){
 }
 
 template <typename T>
-int AbstractData<T>::getRowNum(){
+inline int AbstractData<T>::getRowNum(){
     return rowNum;
 }
 

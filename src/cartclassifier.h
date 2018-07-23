@@ -18,14 +18,11 @@ private:
     using Flag = NTable<StandardData::Category>;
     using Inst = NTable<double>;
 
-    int attr;
     class Node;
     QVector<Node> pool;
 
-    bool cmp(const int &x,const int &y);
     double gini(const QMap<double,int> &cate, int num);
     int treeGenerate(const Inst &instX, const Flag &flagX, const Inst &instY, const QMap<double,int> &cate);
-    void quickSort(QList<int>::iterator b, QList<int>::iterator e);
 };
 
 #endif // CARTCLASSIFIER_H

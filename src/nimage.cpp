@@ -95,7 +95,7 @@ void NImage::saveStandardRow(QVector<double> row, QString path, int width, int h
 StandardData NImage::qImageToStandardData(QVector<QImage> &images, int width, int height,
                                           NImage::Fit fit, QColor color)
 {
-    StandardData stdData = StandardData();
+    StandardData stdData;
     if(!width || !height) {
         bool w = !width, h = !height;
         for(auto itr = images.begin(); itr < images.end(); itr++) {
@@ -145,7 +145,7 @@ StandardData NImage::loadStandardData(QString folderPath, int width, int height,
 QVector<QImage> NImage::standardDataToQImage(StandardData &stdData, int width, int height,
                                              int start, int end, QImage::Format format)
 {
-    QVector<QImage> images = QVector<QImage>();
+    QVector<QImage> images;
 
     if(!end) end = stdData.getRowNum();
     for(int i = start; i < end; i++) {
@@ -173,7 +173,7 @@ void NImage::saveStandardData(StandardData &stdData, QString name, int width, in
 }
 
 void NImage::test() {
-    StandardData testData = StandardData();
+    StandardData testData;
     QTime time;
     time.start();
     testData.loadCsv("../../tests/data/test.csv", true, false);

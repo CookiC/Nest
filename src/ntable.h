@@ -26,10 +26,11 @@ public:
     void appendRow(const NTable<T>& src);
     T& at(int i, int j);
     void clear();
-    void copy(const NTable<T> *src);
-    void copyCol(const NTable<T> *src);
-    void cutCol(NTable<T> *src, int index);
-    void cutRow(NTable<T> *src, int index);
+    void copy(const NTable<T> &src);
+    void copyCol(const NTable<T> &src);
+    void copyRow(const NTable<T> &src);
+    void cutCol(NTable<T> &src, int index);
+    void cutRow(NTable<T> &src, int index);
     void deleteCol(int index);
     void deleteRow(int index);
     const T& get(int i,int j) const;
@@ -106,13 +107,19 @@ void NTable<T>::copy(const NTable<T> *src){
 }
 
 template <typename T>
-void NTable<T>::copyCol(NTable<T> *des, const NTable<T> *src){
-    des->colIndex.clear();
-    des->colIndex.append(src->colIndex);
+void NTable<T>::copyCol(const NTable<T> &src){
+    colIndex.clear();
+    colIndex.append(src.colIndex);
 }
 
 template <typename T>
-void NTable<T>::cutCol(NTable<T> *des, NTable<T> *src,int index){
+void NTable<T>::copyRow(const NTable<T> &src){
+    rowIndex.clear();
+    rowIndex.append(src.rowIndex);
+}
+
+template <typename T>
+void NTable<T>::cutCol(NTable<T> &src,int index){
     des->rowIndex.clear();
     des->rowIndex.append(src->rowIndex);
     des->colIndex.append(src->colIndex[index]);

@@ -118,6 +118,21 @@ int CARTClassifier::treeGenerate(const Inst &uInstX, const Flag &uFlagX, const I
     NTableFunc::copyCol(lFlagX,lInstY);
     for(j=0;j<m;++j){
         if(lFlagX.get(0,j)==StandardData::NUM){
+            lInstX.sortByCol(j);
+            NTableFunc::copyCol(lInstY,lInstX);
+            NTableFunc::copyCol(lFlagX,lInstX);
+            while(lInstX.getRowNum()>1){
+                tmp = lInstX.get(0,j);
+                while(tmp == lInstX.get(0,j)){
+                    ++rCate[lInstY.get(0,0)];
+                    rInstX.appendCol(lInstX, 0);
+                    --lCate[lInstY.get(0,0)];
+                    lInstX.popFrontCol();
+                    lInstY.popFrontCol();
+                }
+
+            }
+            lInstX.appendCol(rInstX);
             /*
             do{
                 for(i=0;lInstY.get(i,0)==lInstY.get(0,0);++i)

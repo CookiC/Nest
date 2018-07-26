@@ -35,9 +35,13 @@ public:
     ~NTable();
 
     bool appendCol(const QVector<T>& col);
+    void appendCol(const NTable<T>& src);
+    void appendCol(const NTable<T>& src, int index);
+    void appendCol(const NTable<T>& src, int position, int n);
     bool appendRow(const QVector<T>& row);
-    void appendCol(const NTable<T>& src, int position = 0, int n = -1);
-    void appendRow(const NTable<T>& src, int position = 0, int n = -1);
+    void appendRow(const NTable<T>& src);
+    void appendRow(const NTable<T>& src, int index);
+    void appendRow(const NTable<T>& src, int position, int n);
     T& at(int i, int j);
     void clear();
     void clearCol();
@@ -93,8 +97,13 @@ inline bool NTable<T>::appendCol(const QVector<T>& col){
 }
 
 template <typename T>
-inline bool NTable<T>::appendRow(const QVector<T>& row){
-    return insertRow(row.size(),row);
+inline void NTable<T>::appendCol(const NTable<T>& src){
+    colIndex.append(src.colIndex);
+}
+
+template <typename T>
+inline void NTable<T>::appendCol(const NTable<T>& src, int index){
+    colIndex.append(src.colIndex[index]);
 }
 
 template <typename T>
@@ -104,6 +113,21 @@ void NTable<T>::appendCol(const NTable<T>& src, int pos, int n){
     else
         for(int i=0;i<n;++i)
             colIndex.append(src.colIndex[pos+i]);
+}
+
+template <typename T>
+inline bool NTable<T>::appendRow(const QVector<T>& row){
+    return insertRow(row.size(),row);
+}
+
+template <typename T>
+inline void NTable<T>::appendRow(const NTable<T>& src){
+    rowIndex.append(src.rowIndex);
+}
+
+template <typename T>
+inline void NTable<T>::appendRow(const NTable<T>& src, int index){
+    rowIndex.append(src.rowIndex[index]);
 }
 
 template <typename T>

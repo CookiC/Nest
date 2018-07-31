@@ -305,7 +305,6 @@ inline void NTable<T>::popFrontRow(){
 
 template <typename T>
 void NTable<T>::selectCol(const NTable<T> &src, const QVector<int> &index){
-
 }
 
 template <typename T>
@@ -416,7 +415,6 @@ void selectRow(NTable<T> &des, const NTable<U> &src, const QVector<int> &index){
     for(auto i:index)
         des.rowIndex.append(src.rowIndex[i]);
 }
-
 }
 
 //private

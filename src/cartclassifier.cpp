@@ -73,7 +73,7 @@ int CARTClassifier::treeGenerate(const Inst &uInstX, const Flag &uFlagX, const I
         for(j=0;j<m;++j){
             same=true;
             for(i=0;i<n-1&&same;++i)
-                if(uInstX->get(i,j)!=uInstX->get(i,j))
+                if(uInstX.get(i,j)!=uInstX.get(i+1,j))
                     same = false;
             if(!same)
                 attrIndex.append(j);
@@ -96,14 +96,14 @@ int CARTClassifier::treeGenerate(const Inst &uInstX, const Flag &uFlagX, const I
             return pool.size()-1;
     }
 
-    Inst vInstX,lInstX;
-    Inst vInstY,lInstY;
-    Flag vFlagX,lFlagX;
-    Inst::selectCol(&vInstX, &uInstX, attrIndex);
-    Inst::copy(&vInstY,&uInstY);
-    Flag::selectCol(&vFlagX, &uFlagX, attrIndex);
-    n = vInstX.getRowNum();
-    m = vInstX.getColNum();
+    Inst lInstX,rInstX;
+    Inst lInstY,rInstY;
+    Flag lFlagX,rFlagX;
+    lInstX.selectCol(uInstX, attrIndex);
+    NTableFunc::copy(lInstY,uInstY);
+    lFlagX.selectCol(uFlagX, attrIndex);
+    n = lInstX.getRowNum();
+    m = lInstX.getColNum();
     Node &node = pool.last();
     double tmp;
     double g=0;
@@ -114,17 +114,30 @@ int CARTClassifier::treeGenerate(const Inst &uInstX, const Flag &uFlagX, const I
     QMap<double, int> rCate;
 
     lInstY.sortByCol(0);
-    Inst::copyCol(lInstY,lInstX);
-    Flag::copyCol(lFlagX,lInstX);
+    NTableFunc::copyCol(lInstX,lInstY);
+    NTableFunc::copyCol(lFlagX,lInstY);
     for(j=0;j<m;++j){
-        if(vFlagX.get(0,j)==StandardData::NUM){
-            tmp = lInstY.get(0,0);
-            do{
-                for(auto e:rInst){
-                    lInst.append(e);
-                    ++lCate[e];
+        if(lFlagX.get(0,j)==StandardData::NUM){
+            lInstX.sortByCol(j);
+            NTableFunc::copyCol(lInstY,lInstX);
+            NTableFunc::copyCol(lFlagX,lInstX);
+            while(lInstX.getRowNum()>1){
+                tmp = lInstX.get(0,j);
+                while(tmp == lInstX.get(0,j)){
+                    ++rCate[lInstY.get(0,0)];
+                    rInstX.appendCol(lInstX, 0);
+                    --lCate[lInstY.get(0,0)];
+                    lInstX.popFrontCol();
+                    lInstY.popFrontCol();
                 }
-                rInst.clear();
+
+            }
+            lInstX.appendCol(rInstX);
+            /*
+            do{
+                for(i=0;lInstY.get(i,0)==lInstY.get(0,0);++i)
+                    ++l
+                rInstX.appendRow(rInstX, 0, i);
                 rCate.clear();
                 do{
                     int I = lInst[0];
@@ -142,6 +155,7 @@ int CARTClassifier::treeGenerate(const Inst &uInstX, const Flag &uFlagX, const I
                     rMaxInst = rInst;
                 }
             }while(tmp != lInst[0]);
+    */
         }
     }
     return 1;

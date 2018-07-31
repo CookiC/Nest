@@ -9,9 +9,9 @@ StandardData::~StandardData(){
         delete[] nomName;
 }
 
-void StandardData::cutCol(StandardData *des, StandardData *src, int index){
-    NTable<Category>::cutCol(&(des->flag),&(src->flag),index);
-    AbstractData::cutCol(des,src,index);
+void StandardData::cutCol(StandardData &src, int index){
+    flag.cutCol(src.flag,index);
+    AbstractData::cutCol(src,index);
 }
 
 //protect

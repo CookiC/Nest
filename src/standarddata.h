@@ -28,8 +28,8 @@ public:
     StandardData* cutColFrom(const QVector<int> &colIndex);
     const NTable<Category>& getFlag();
     void setMissing(int, int);
+    void cutCol(StandardData &src, int index);
 
-    static void cutCol(StandardData *des, StandardData *src, int index);
     static void test();
 };
 

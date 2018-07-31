@@ -14,12 +14,9 @@ public:
 protected:
     StandardData *trainX;
     StandardData *trainY;
-    int attrNum;
 
     virtual void fit() = 0;
     bool compareAttr(StandardData *data);
-private:
-    char *attrCategory;
 
 };
 

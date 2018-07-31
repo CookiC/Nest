@@ -96,7 +96,7 @@ inline bool NTableBlock<T>::appendCol(const QVector<T>& col){
     if(rowNum!=col.size())
         return false;
     if(colNum>=colMax)
-        moveCol(colMax+qMax(1u,colMax>>1));
+        moveCol(colMax+qMax(1,colMax>>1));
     for(int i=0;i<rowNum;++i)
         data[i][colNum] = col[i];
     ++colNum;
@@ -112,7 +112,7 @@ inline bool NTableBlock<T>::appendRow(const QVector<T>& row){
     if(colNum!=row.size())
         return false;
     if(rowNum>=rowMax)
-        moveRow(rowMax+qMax(1u,rowMax>>1));
+        moveRow(rowMax+qMax(1,rowMax>>1));
     if(!data[rowNum])
         return false;
     data[rowNum] = new T[colMax];
@@ -127,7 +127,7 @@ inline T& NTableBlock<T>::at(const int &i,const int &j){
 }
 
 template<typename T>
-void NTableBlock<T>::deleteQuote(){
+inline void NTableBlock<T>::deleteQuote(){
     --quote;
 }
 
@@ -202,7 +202,7 @@ inline int NTableBlock<T>::getRowNum(){
 
 template<typename T>
 inline void NTableBlock<T>::set(int i, int j, T value){
-    data[i][j]=value;
+    data[i][j] = value;
 }
 
 template<typename T>

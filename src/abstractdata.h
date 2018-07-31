@@ -22,6 +22,7 @@ protected:
 
     void appendColName(const QString &name);
     void appendRowName(const QString &name);
+    void cutCol(AbstractData &src, int index);
     void deleteColName(int index);
     const QString& getColName(int i);
     void deleteRowName(int index);
@@ -32,7 +33,6 @@ protected:
     virtual bool loadRow(int i, const QStringVector &row) = 0;
     virtual void saveRow(int i, QStringVector& row) = 0;
 
-    static void cutCol(AbstractData *des, AbstractData *src, int index);
 public:
     AbstractData(int rowNum = 0, int colNum = 0);
     ~AbstractData();
@@ -88,20 +88,20 @@ bool AbstractData<T>::appendRow(const QVector<T>& col, const QString& name){
 }
 
 template <typename T>
-void AbstractData<T>::cutCol(AbstractData *des, AbstractData *src, int index){
-    des->rowNum = src->rowNum;
-    des->colNum = 1;
-    des->rowNameFlag = src->rowNameFlag;
-    des->colNameFlag = src->colNameFlag;
-    des->rowName.clear();
-    des->colName.clear();
-    if(des->rowNameFlag)
-        des->rowName.append(src->rowName);
-    if(des->colNameFlag){
-        des->colName.append(src->colName[index]);
-        src->colName.remove(index);
+void AbstractData<T>::cutCol(AbstractData &src, int index){
+    rowNum = src.rowNum;
+    colNum = 1;
+    rowNameFlag = src.rowNameFlag;
+    colNameFlag = src.colNameFlag;
+    rowName.clear();
+    colName.clear();
+    if(rowNameFlag)
+        rowName.append(src.rowName);
+    if(colNameFlag){
+        colName.append(src.colName[index]);
+        colName.remove(index);
     }
-    NTable<T>::cutCol(&(des->data), &(src->data), index);
+    data.cutCol(src.data, index);
 }
 
 template <typename T>
@@ -142,7 +142,7 @@ inline int AbstractData<T>::getColNum(){
 }
 
 template <typename T>
-const NTable<T>& AbstractData::getDate(){
+inline const NTable<T>& AbstractData<T>::getDate(){
     return data;
 }
 

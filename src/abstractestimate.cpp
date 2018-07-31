@@ -10,7 +10,7 @@ void AbstractEstimate::setTrainSet(QString path, int indexY){
     if(!trainY)
         trainY = new StandardData();
     trainX->loadCsv(path);
-    StandardData::cutCol(trainY, trainX, indexY);
+    trainY->cutCol(*trainX, indexY);
 }
 
 void AbstractEstimate::run(){
